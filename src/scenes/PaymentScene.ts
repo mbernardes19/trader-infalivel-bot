@@ -1,45 +1,62 @@
-import { BaseScene } from 'telegraf';
+import { BaseScene, Markup, Extra } from 'telegraf';
 import CacheService from '../services/cache';
 import { log } from '../logger';
+import { cartao, boleto } from '../services/validate';
 
-const wizard = new BaseScene('payment')
-wizard.action('cartao_de_credito', async (ctx) => {
+const paymentScene = new BaseScene('payment')
+
+paymentScene.action('cartao_de_credito', async (ctx) => {
     await ctx.answerCbQuery();
-    ctx.scene.state = {formaDePagamento:'cartao_de_credito'};
-    CacheService.saveUserData(ctx, 'forma_de_pagamento', 'cartao_de_credito');
-    await ctx.reply('Ok!')
-    await ctx.reply('Agora me diga qual é o seu nome completo?');
-    ctx.scene.enter('name');
+    await savePaymentMethod('cartao_de_credito');
+    await askForPlano(ctx)
+    await ctx.scene.enter('plano');
 })
 
-wizard.action('boleto', async (ctx) => {
+paymentScene.action('boleto', async (ctx) => {
     await ctx.answerCbQuery();
-    CacheService.saveUserData(ctx, 'forma_de_pagamento', 'boleto');
-    await ctx.reply('Ok!');
-    await ctx.reply('Agora me diga qual é o seu nome completo?');
-    ctx.scene.enter('name');
+    await savePaymentMethod('boleto');
+    await askForPlano(ctx)
+    await ctx.scene.enter('plano');
 })
 
-// wizard.use(async (ctx) => {
-//     if (cartao(ctx)) {
-//         if (!ctx.message) {
-//             await ctx.answerCbQuery()
-//         }
-//         await ctx.reply('Certo!')
-//         await ctx.reply(mensagem.pedir_nome_completo)
-//         log('Forma de pagamento definida')
-//         return ctx.wizard.selectStep(3)
-//     }
-//     if (boleto(ctx)) {
-//         if (!ctx.message) {
-//             await ctx.answerCbQuery()
-//         }
-//         await ctx.reply('Certo!')
-//         CacheService.save('forma_de_pagamento', 'boleto');
-//         await ctx.reply(mensagem.pedir_nome_completo)
-//         log('Forma de pagamento definida')
-//         return ctx.wizard.selectStep(3)
-//     }
-//     awai
+paymentScene.use(async (ctx) => {
+    if (cartao(ctx)) {
+        if (!ctx.message) {
+            await ctx.answerCbQuery()
+        }
+        await savePaymentMethod('cartao_de_credito');
+        await askForPlano(ctx);
+        await ctx.scene.enter('plano');
+    }
+    if (boleto(ctx)) {
+        if (!ctx.message) {
+            await ctx.answerCbQuery()
+        }
+        await savePaymentMethod('boleto');
+        await askForPlano(ctx);
+        await ctx.scene.enter('plano');
+    }
+});
 
-export default wizard;
+const savePaymentMethod = async (paymentMethod) => {
+    CacheService.saveUserData('forma_de_pagamento', paymentMethod);
+    log(`Forma de pagamento definida ${paymentMethod}`);
+}
+
+const showPlanoOptions = async (ctx) => {
+    const planos = Markup.inlineKeyboard([
+        [Markup.callbackButton('🥈 Prata/Silver', 'silver')],
+        [Markup.callbackButton('🥇 Gold', 'gold')],
+        [Markup.callbackButton('💎 Diamond', 'diamond')],
+        [Markup.callbackButton('💎⬛ Black Diamond', 'black_diamond')]
+    ])
+    await ctx.reply("Qual foi o plano que você contratou?", Extra.markup(planos))
+}
+
+const askForPlano = async (ctx) => {
+    await ctx.reply('Certo!');
+    await ctx.reply('Vou precisar de mais alguns dados pra confirmar o pagamento no servidor da Monetizze, tudo bem?');
+    await showPlanoOptions(ctx);
+}
+
+export default paymentScene;
