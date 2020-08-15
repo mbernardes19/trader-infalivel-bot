@@ -1,12 +1,16 @@
 
-const log = (message: string) => {
+const logError = (message: string|string[]) => {
     const time = getTimeString();
+    console.log(time, 'ERROR', message);
+}
 
-    return {
-        info: () => console.log(time, 'INFO', message),
-        error: () => console.log(time, 'ERROR', message),
-        warning: () => console.log(time, 'WARNING', message)
-    }
+const logWarning = (message: string|string[]) => {
+    const time = getTimeString();
+    console.log(time, 'WARNING', message);
+}
+const log = (message: string|string[]) => {
+    const time = getTimeString();
+    console.log(time, 'INFO', message);
 }
 
 const getTimeString = (): string => {
@@ -21,4 +25,4 @@ const getTimeString = (): string => {
     return `[${day}-${month}-${year} ${hour}:${minute}:${second}::${millisseconds}]`;
 }
 
-export { log }
+export { log, logWarning, logError }

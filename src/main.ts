@@ -33,5 +33,4 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Olá!');
 });
 
-app.listen(3000, () => console.log('conectado na porta 3000'))
-log('iniciou').info()
+app.listen(3000, () => log('conectado na porta 3000'))
