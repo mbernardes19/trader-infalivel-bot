@@ -1,10 +1,9 @@
 import NodeCache from 'node-cache';
-import { TelegrafContext } from 'telegraf/typings/context';
 
 export default class CacheService {
     private static cache = new NodeCache();
 
-    static saveUserData(ctx: TelegrafContext, key: string, value: any) {
+    static saveUserData(key: string, value: any) {
         this.save(key, value);
     }
 
@@ -14,6 +13,10 @@ export default class CacheService {
 
     static get<T>(key: string) {
         return this.cache.get<T>(key);
+    }
+
+    static showAllKeys() {
+        return this.cache.keys()
     }
 
 }
