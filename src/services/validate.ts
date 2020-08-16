@@ -1,6 +1,6 @@
 import { TELEFONE, EMAIL, CARTAO, BOLETO, SIM, NAO, PLANO } from '../util/regex';
 
-const validar = (informacao, dado) => {
+const validate = (informacao, dado) => {
     switch(informacao) {
         case 'telefone':
             return TELEFONE.test(dado.replace(/ /g, "")) ?
@@ -24,4 +24,4 @@ const blackDiamond = (ctx) => PLANO.BLACK_DIAMOND.test(ctx.message.text);
 const confirmado = (ctx) => SIM.test(ctx.message.text);
 const negado = (ctx) => NAO.test(ctx.message.text);
 
-export { formaDePagamentoValida, cartao, boleto, confirmado, negado, silver, gold, diamond, blackDiamond }
+export { formaDePagamentoValida, cartao, boleto, confirmado, negado, silver, gold, diamond, blackDiamond, validate }
