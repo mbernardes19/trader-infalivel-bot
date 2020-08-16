@@ -14,9 +14,13 @@ const getDiscountCouponIdFromUser = async (userEmail, userPlano) => {
 
 const verifyUserPurchase = async (email) => {
     try {
-        const response = await getMonetizzeProductTransaction({ email, "status[]": 2 })
-        log(`Verificando compra de usuário na Monetizze ${JSON.stringify(response)}`)
-        return response.recordCount === "0" ? false : true;
+        const responseCompletas = await getMonetizzeProductTransaction({ email, "status[]": 2 })
+        log(`Verificando compra de usuário na Monetizze ${JSON.stringify(responseCompletas)}`)
+        if (responseCompletas.recordCount === "0") {
+            const responseFinalizadas = await getMonetizzeProductTransaction({ email, "status[]": 6 })
+            return responseFinalizadas.recordCount === "0" ? false : true;
+       }
+       return true;
     } catch (err) {
         throw err
     }
