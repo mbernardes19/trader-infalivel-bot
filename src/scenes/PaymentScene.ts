@@ -46,10 +46,10 @@ const savePaymentMethod = async (paymentMethod) => {
 
 const showPlanoOptions = async (ctx) => {
     const planos = Markup.inlineKeyboard([
-        [Markup.callbackButton('🥈 Prata/Silver', 'silver')],
-        [Markup.callbackButton('🥇 Gold', 'gold')],
-        [Markup.callbackButton('💎 Diamond', 'diamond')],
-        [Markup.callbackButton('💎⬛ Black Diamond', 'black_diamond')]
+        [Markup.callbackButton('🥈 Prata/Silver', '78914')],
+        [Markup.callbackButton('🥇 Gold', '90965')],
+        [Markup.callbackButton('💎 Diamond', '90966')],
+        [Markup.callbackButton('💎⬛ Black Diamond', '91261')]
     ])
     await ctx.reply("Qual foi o plano que você contratou?", Extra.markup(planos))
 }
