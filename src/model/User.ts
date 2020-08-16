@@ -6,4 +6,8 @@ export default class User {
     constructor(userData: UserData) {
         this.userData = userData;
     }
+
+    getUserData(): UserData {
+        return this.userData
+    }
 }

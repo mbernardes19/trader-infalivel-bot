@@ -19,4 +19,8 @@ export default class CacheService {
         return this.cache.keys()
     }
 
+    static clearAllUserData() {
+        this.cache.flushAll();
+    }
+
 }
