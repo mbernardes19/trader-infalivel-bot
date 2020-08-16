@@ -6,8 +6,8 @@ export interface MonetizzeTrasactionOptions {
     date_max?: string,
     end_date_min?: string,
     end_date_max?: string,
-    'status[]'?: number[],
-    'forma_pagamento[]'?: number[],
+    'status[]'?: number|number[],
+    'forma_pagamento[]'?: number,
     page?: number
 };
 
@@ -25,6 +25,8 @@ export interface MonetizzeTransaction {
     comissoes?: Comissoes | null,
     comprador: Comprador,
     produtor: Produtor,
+    assinatura?: Assinatura,
+    plano?: Plano,
     downloads: string
 }
 
@@ -32,6 +34,20 @@ export interface Produto {
     codigo: string,
     chave: string,
     nome: string,
+}
+
+export interface Plano {
+    codigo: string,
+    referenia: string,
+    nome: string,
+    periodicidade: string|number
+}
+
+export interface Assinatura {
+    codigo: string,
+    status: string|number,
+    data_assinatura: string,
+    parcela: string|number
 }
 
 export interface Venda {
