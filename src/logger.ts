@@ -1,7 +1,7 @@
 
-const logError = (message: string|string[]) => {
+const logError = (message: string|string[], error: any) => {
     const time = getTimeString();
-    console.log(time, 'ERROR', message);
+    console.log(time, 'ERROR', message, error);
 }
 
 const logWarning = (message: string|string[]) => {
