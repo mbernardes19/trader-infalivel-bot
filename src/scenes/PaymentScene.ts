@@ -26,7 +26,7 @@ paymentScene.use(async (ctx) => {
         }
         await savePaymentMethod('cartao_de_credito');
         await askForPlano(ctx);
-        await ctx.scene.enter('plano');
+        return await ctx.scene.enter('plano');
     }
     if (boleto(ctx)) {
         if (!ctx.message) {
@@ -34,8 +34,9 @@ paymentScene.use(async (ctx) => {
         }
         await savePaymentMethod('boleto');
         await askForPlano(ctx);
-        await ctx.scene.enter('plano');
+        return await ctx.scene.enter('plano');
     }
+    await ctx.reply('Por favor, escolha uma das opções acima');
 });
 
 const savePaymentMethod = async (paymentMethod) => {

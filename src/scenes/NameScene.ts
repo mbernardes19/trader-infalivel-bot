@@ -5,10 +5,26 @@ import { confirmado, negado } from '../services/validate';
 
 const nameScene = new BaseScene('name');
 
+nameScene.enter(async (ctx) => {
+    if (!CacheService.get<string>('nome_completo')) {
+        return await askForFullName(ctx);
+    }
+    await askForFullNameAgain(ctx);
+})
+
 nameScene.use(async (ctx) => {
     await confirmFullName(ctx);
     await saveFullName(ctx.message.text);
 });
+
+const askForFullName = async (ctx) => {
+    await ctx.reply('Ok!');
+    await ctx.reply('Qual é o seu nome completo?');
+}
+
+const askForFullNameAgain = async (ctx) => {
+    await ctx.reply('Por favor, digite seu nome completo novamente:')
+}
 
 const confirmFullName = async (ctx) => {
     const confirmacao = Markup.inlineKeyboard([Markup.callbackButton('👍 Sim', 'sim'), Markup.callbackButton('👎 Não', 'nao')])
@@ -17,6 +33,7 @@ const confirmFullName = async (ctx) => {
 }
 
 const saveFullName = async (fullname) => {
+    log('salvou o nome')
     CacheService.saveUserData('nome_completo', fullname);
     log(`Nome completo definido ${fullname}`);
 }
@@ -30,7 +47,6 @@ confirmNameScene.action('sim', async (ctx) => {
 });
 
 confirmNameScene.action('nao', async (ctx) => {
-    await ctx.reply('Por favor, digite seu nome completo novamente:')
     return ctx.scene.enter('name');
 });
 
@@ -41,9 +57,9 @@ confirmNameScene.use(async (ctx) => {
         return ctx.scene.enter('phone');
     }
     if (negado(ctx)) {
-        await ctx.reply('Por favor, digite seu nome completo novamente:')
         return ctx.scene.enter('name');
     }
+    await ctx.reply('Por favor, escolha uma das opções acima');
 });
 
 export { nameScene, confirmNameScene };
