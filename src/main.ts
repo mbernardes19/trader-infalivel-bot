@@ -3,6 +3,7 @@ import { Telegraf, Stage, session } from 'telegraf';
 import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
 import { log } from './logger';
+import { getMonetizzeProductTransaction } from './services/request'
 dotEnv.config();
 
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
@@ -22,10 +23,11 @@ const bot = new Telegraf(botToken);
 bot.use(session())
 bot.use(MainStage.middleware())
 bot.command('start', Stage.enter('welcome'))
-bot.on('message', ctx => {
-    ctx.reply('respondendo')
+bot.on('message', async ctx => {
+    ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/stop - Parar nossa conversa')
 })
 bot.launch()
+
 
 const app: Express = App();
 
