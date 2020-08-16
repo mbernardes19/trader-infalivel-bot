@@ -23,6 +23,7 @@ export interface MonetizzeTransaction {
     produto: Produto,
     venda: Venda,
     comissoes?: Comissoes | null,
+    comprador: Comprador,
     produtor: Produtor,
     downloads: string
 }
