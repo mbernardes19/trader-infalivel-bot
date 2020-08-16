@@ -9,6 +9,12 @@ import { connection } from '../db';
 import { getChat } from '../services/chatResolver';
 
 const analysisScene = new BaseScene('analysis')
+
+analysisScene.command('reiniciar', ctx => {
+    CacheService.clearAllUserData()
+    return ctx.scene.enter('welcome')
+})
+
 analysisScene.enter(async (ctx) => {
     await ctx.reply('Verificando sua compra nos servidores da Monetizze...');
     const email = CacheService.get<string>('email');

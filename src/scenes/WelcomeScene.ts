@@ -1,6 +1,12 @@
 import { BaseScene, Markup, Extra } from 'telegraf';
+import CacheService from '../services/cache';
 
 const welcomeScene = new BaseScene('welcome')
+
+welcomeScene.command('reiniciar', ctx => {
+    CacheService.clearAllUserData()
+    return ctx.scene.enter('welcome')
+})
 
 welcomeScene.enter(async (ctx) => {
     await welcome(ctx);

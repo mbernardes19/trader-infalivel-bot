@@ -23,8 +23,9 @@ const bot = new Telegraf(botToken);
 bot.use(session())
 bot.use(MainStage.middleware())
 bot.command('start', Stage.enter('welcome'))
+
 bot.on('message', async ctx => {
-    ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/stop - Parar nossa conversa')
+    ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/reiniciar - Começar nossa conversa do zero novamente')
 })
 bot.launch()
 

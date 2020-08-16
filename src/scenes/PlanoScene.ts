@@ -6,6 +6,11 @@ import { Planos } from '../model/Planos';
 
 const planoScene = new BaseScene('plano')
 
+planoScene.command('reiniciar', ctx => {
+    CacheService.clearAllUserData()
+    return ctx.scene.enter('welcome')
+})
+
 planoScene.action(Planos.SILVER, async (ctx) => {
     await ctx.answerCbQuery();
     await savePlano(Planos.SILVER);

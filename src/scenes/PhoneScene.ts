@@ -5,6 +5,12 @@ import { confirmado, negado, validate } from '../services/validate';
 
 const phoneScene = new BaseScene('phone');
 
+phoneScene.command('reiniciar', ctx => {
+    CacheService.clearAllUserData()
+    return ctx.scene.enter('welcome')
+})
+
+
 phoneScene.enter(async (ctx) => {
     if (!CacheService.get<string>('telefone')) {
         return await askForPhone(ctx);

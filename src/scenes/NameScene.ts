@@ -5,6 +5,11 @@ import { confirmado, negado } from '../services/validate';
 
 const nameScene = new BaseScene('name');
 
+nameScene.command('reiniciar', ctx => {
+    CacheService.clearAllUserData()
+    return ctx.scene.enter('welcome')
+})
+
 nameScene.enter(async (ctx) => {
     if (!CacheService.get<string>('nome_completo')) {
         return await askForFullName(ctx);

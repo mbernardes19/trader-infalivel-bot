@@ -5,6 +5,11 @@ import { cartao, boleto } from '../services/validate';
 
 const paymentScene = new BaseScene('payment')
 
+paymentScene.command('reiniciar', ctx => {
+    CacheService.clearAllUserData()
+    return ctx.scene.enter('welcome')
+})
+
 paymentScene.action('cartao_de_credito', async (ctx) => {
     await ctx.answerCbQuery();
     await savePaymentMethod('cartao_de_credito');

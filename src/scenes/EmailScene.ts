@@ -5,6 +5,11 @@ import { confirmado, negado, validate } from '../services/validate';
 
 const emailScene = new BaseScene('email');
 
+emailScene.command('reiniciar', ctx => {
+    CacheService.clearAllUserData()
+    return ctx.scene.enter('welcome')
+})
+
 emailScene.enter(async (ctx) => {
     if (!CacheService.get<string>('email')) {
         return await askForEmail(ctx);
