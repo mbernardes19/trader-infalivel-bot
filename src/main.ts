@@ -23,6 +23,7 @@ const bot = new Telegraf(botToken);
 bot.use(session())
 bot.use(MainStage.middleware())
 bot.command('start', Stage.enter('welcome'))
+bot.command('reiniciar', Stage.enter('welcome'))
 
 bot.on('message', async ctx => {
     ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/reiniciar - Começar nossa conversa do zero novamente')
@@ -36,4 +37,5 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Olá!');
 });
 
-app.listen(3000, () => log('conectado na porta 3000'))
+const PORT = process.env.PORT_TRADER_INFALIVEL_BOT || process.env.PORT_APP || 3000
+app.listen(PORT, () => log('conectado na porta 3000'))
