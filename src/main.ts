@@ -46,5 +46,5 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Olá!');
 });
 
-const PORT = process.env.PORT_TRADER_INFALIVEL_BOT_MAIN || process.env.PORT_MAIN || 3000
+const PORT = process.env.PORT_TRADER_INFALIVEL_BOT_DIST_MAIN || process.env.PORT_MAIN || 3000
 app.listen(PORT, () => log('conectado na porta 3000'))
