@@ -28,6 +28,9 @@ bot.command('start', Stage.enter('welcome'))
 bot.command('reiniciar', Stage.enter('welcome'))
 
 bot.on('message', async ctx => {
+    if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
+        return;
+    }
     const res = await getMonetizzeProductTransaction({email: 'rafael.touringcar@gmail.com'})
     res.dados.map(dado => console.log(dado.comprador.email, dado.venda.dataInicio, dado.plano, dado.assinatura.data_assinatura));
     ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/reiniciar - Começar nossa conversa do zero novamente')
