@@ -4,7 +4,8 @@ import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
 import { log } from './logger';
 import { getMonetizzeProductTransaction } from './services/request'
-// import { isBefore } from 'date-fns'
+import CacheService from "./services/cache";
+import { isBefore } from "date-fns";
 dotEnv.config();
 
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
@@ -27,15 +28,8 @@ bot.command('start', Stage.enter('welcome'))
 bot.command('reiniciar', Stage.enter('welcome'))
 
 bot.on('message', async ctx => {
-    // const res = await getMonetizzeProductTransaction({"status[]": 2})
-    // res.dados.map(dado => {
-    //     const dataAssinatura = dado.assinatura.data_assinatura
-    //     const ano = parseInt(dataAssinatura.substring(0,4), 10)
-    //     const mes = parseInt(dataAssinatura.substring(5,7),10)
-    //     const dia = parseInt(dataAssinatura.substring(8,10),10)
-    //     console.log(dado.assinatura.data_assinatura)
-    //     console.log(isBefore(new Date(ano, mes-1, dia), new Date(2020,7,6)))
-    // })
+    const res = await getMonetizzeProductTransaction({email: 'rafael.touringcar@gmail.com'})
+    res.dados.map(dado => console.log(dado.comprador.email, dado.venda.dataInicio, dado.plano, dado.assinatura.data_assinatura));
     ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/reiniciar - Começar nossa conversa do zero novamente')
 })
 bot.launch()

@@ -7,4 +7,5 @@ export default class UserData {
     fullName: string;
     phone: string;
     email: string;
+    dataAssinatura: string;
 }
