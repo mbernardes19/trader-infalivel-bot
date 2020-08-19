@@ -1,12 +1,23 @@
 import { getMonetizzeProductTransaction } from './request';
 import { log } from '../logger';
+import CacheService from './cache';
 
 const getDiscountCouponIdFromUser = async (userEmail, userPlano) => {
     try {
         const transaction = await getMonetizzeProductTransaction({ email: userEmail })
         log(`Pegando cupom de desconto do usuário na Monetizze`);
         const transactionFromPlano = transaction.dados.filter(dado => dado.venda.plano === userPlano);
-        return transactionFromPlano[0].venda.cupom;
+        return transactionFromPlano[0].venda.cupom !== null ? transactionFromPlano[0].venda.cupom : '0';
+    } catch (err) {
+        throw err;
+    }
+}
+
+const getDataAssinaturaFromUser = async (userEmail: string) => {
+    try {
+        const transaction = await getMonetizzeProductTransaction({ email: userEmail })
+        log(`Pegando data de assinatura do usuário na Monetizze`);
+        return transaction.dados[0].venda.dataInicio;
     } catch (err) {
         throw err;
     }
@@ -18,9 +29,28 @@ const verifyUserPurchase = async (email) => {
         log(`Verificando compra de usuário na Monetizze ${JSON.stringify(responseCompletas)}`)
         if (responseCompletas.recordCount === "0") {
             const responseFinalizadas = await getMonetizzeProductTransaction({ email, "status[]": 6 })
-            return responseFinalizadas.recordCount === "0" ? false : true;
+            if (responseFinalizadas.recordCount === "0") {
+                return false;
+            }
+            if (responseFinalizadas.dados[0].assinatura.status !== 'Ativa') {
+                return false;
+            }
+            return true;
+       }
+       if (responseCompletas.dados[0].assinatura.status !== 'Ativa') {
+           return false;
        }
        return true;
+    } catch (err) {
+        throw err
+    }
+}
+
+const confirmPlano = async (email) => {
+    try {
+        const responseCompletas = await getMonetizzeProductTransaction({ email })
+        log(`Confirmando plano de usuário na Monetizze ${JSON.stringify(responseCompletas)}`)
+        return responseCompletas.dados[0].plano.codigo !== CacheService.getPlano() ? false : true;
     } catch (err) {
         throw err
     }
@@ -36,5 +66,4 @@ const checkIfPaymentMethodIsBoleto = async (email) => {
     }
 }
 
-
-export { getDiscountCouponIdFromUser, verifyUserPurchase, checkIfPaymentMethodIsBoleto }
+export { getDiscountCouponIdFromUser, verifyUserPurchase, confirmPlano, getDataAssinaturaFromUser, checkIfPaymentMethodIsBoleto }
