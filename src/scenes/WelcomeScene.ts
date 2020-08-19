@@ -3,12 +3,23 @@ import CacheService from '../services/cache';
 
 const welcomeScene = new BaseScene('welcome')
 
-welcomeScene.command('reiniciar', ctx => {
+welcomeScene.command('reiniciar', async ctx => {
+    if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
+        return await ctx.scene.leave();
+    }
     CacheService.clearAllUserData()
-    return ctx.scene.enter('welcome')
+    return await ctx.scene.enter('welcome')
+})
+
+welcomeScene.command('parar', async ctx => {
+    CacheService.clearAllUserData()
+    return await ctx.scene.leave()
 })
 
 welcomeScene.enter(async (ctx) => {
+    if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
+        return await ctx.scene.leave();
+    }
     console.log(CacheService.getFullName());
     await welcome(ctx);
     await showPaymentOptions(ctx);

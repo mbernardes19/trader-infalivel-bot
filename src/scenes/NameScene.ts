@@ -10,6 +10,11 @@ nameScene.command('reiniciar', ctx => {
     return ctx.scene.enter('welcome')
 })
 
+nameScene.command('parar', async ctx => {
+    CacheService.clearAllUserData()
+    return await ctx.scene.leave()
+})
+
 nameScene.enter(async (ctx) => {
     if (!CacheService.getFullName()) {
         return await askForFullName(ctx);

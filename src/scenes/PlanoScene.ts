@@ -11,6 +11,11 @@ planoScene.command('reiniciar', ctx => {
     return ctx.scene.enter('welcome')
 })
 
+planoScene.command('parar', async ctx => {
+    CacheService.clearAllUserData()
+    return await ctx.scene.leave()
+})
+
 planoScene.action(Planos.SILVER, async (ctx) => {
     await ctx.answerCbQuery();
     await savePlano(Planos.SILVER);

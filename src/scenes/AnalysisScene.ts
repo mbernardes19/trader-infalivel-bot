@@ -15,6 +15,11 @@ analysisScene.command('reiniciar', ctx => {
     return ctx.scene.enter('welcome')
 })
 
+analysisScene.command('parar', async ctx => {
+    CacheService.clearAllUserData()
+    return await ctx.scene.leave()
+})
+
 analysisScene.enter(async (ctx) => {
     await ctx.reply('Verificando sua compra nos servidores da Monetizze...');
     const email = CacheService.getEmail();

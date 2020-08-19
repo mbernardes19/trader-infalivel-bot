@@ -10,6 +10,11 @@ emailScene.command('reiniciar', ctx => {
     return ctx.scene.enter('welcome')
 })
 
+emailScene.command('parar', async ctx => {
+    CacheService.clearAllUserData()
+    return await ctx.scene.leave()
+})
+
 emailScene.enter(async (ctx) => {
     if (!CacheService.getEmail()) {
         return await askForEmail(ctx);

@@ -10,6 +10,11 @@ phoneScene.command('reiniciar', ctx => {
     return ctx.scene.enter('welcome')
 })
 
+phoneScene.command('parar', async ctx => {
+    CacheService.clearAllUserData()
+    return await ctx.scene.leave()
+})
+
 
 phoneScene.enter(async (ctx) => {
     console.log('TELEFONE', CacheService.getPhone())
