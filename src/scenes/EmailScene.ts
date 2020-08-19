@@ -11,7 +11,7 @@ emailScene.command('reiniciar', ctx => {
 })
 
 emailScene.enter(async (ctx) => {
-    if (!CacheService.get<string>('email')) {
+    if (!CacheService.getEmail()) {
         return await askForEmail(ctx);
     }
     await askForEmailAgain(ctx);
@@ -38,14 +38,14 @@ const confirmEmail = async (ctx) => {
 }
 
 const saveEmail = async (email) => {
-    CacheService.saveUserData('email', email);
+    CacheService.saveEmail(email);//'matheus.viegas@gmail.com'
     log(`Email definido ${email}`);
 }
 
 const confirmEmailScene = new BaseScene('confirm_email');
 
 confirmEmailScene.action('sim', async (ctx) => {
-    const email = CacheService.get<string>('email');
+    const email = CacheService.getEmail();
     const validation = validate('email', email);
     if (validation.temErro) {
         await ctx.reply(validation.mensagemDeErro);
@@ -62,7 +62,7 @@ confirmEmailScene.action('nao', async (ctx) => {
 
 confirmEmailScene.use(async (ctx) => {
     if (confirmado(ctx)) {
-        const email = CacheService.get<string>('email');
+        const email = CacheService.getEmail();
         const validation = validate('email', email);
         if (validation.temErro) {
             await ctx.reply(validation.mensagemDeErro);

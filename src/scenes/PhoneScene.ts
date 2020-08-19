@@ -12,7 +12,8 @@ phoneScene.command('reiniciar', ctx => {
 
 
 phoneScene.enter(async (ctx) => {
-    if (!CacheService.get<string>('telefone')) {
+    console.log('TELEFONE', CacheService.getPhone())
+    if (!CacheService.getPhone()) {
         return await askForPhone(ctx);
     }
     await askForPhoneAgain(ctx);
@@ -39,14 +40,14 @@ const confirmPhone = async (ctx) => {
 }
 
 const savePhoneNumber = async (phone) => {
-    CacheService.saveUserData('telefone', phone);
+    CacheService.savePhone(phone);
     log(`Número de telefone definido ${phone}`);
 }
 
 const confirmPhoneScene = new BaseScene('confirm_phone');
 
 confirmPhoneScene.action('sim', async (ctx) => {
-    const telefone = CacheService.get<string>('telefone');
+    const telefone = CacheService.getPhone();
     const validation = validate('telefone', telefone);
     if (validation.temErro) {
         await ctx.reply(validation.mensagemDeErro);
@@ -63,7 +64,7 @@ confirmPhoneScene.action('nao', async (ctx) => {
 
 confirmPhoneScene.use(async (ctx) => {
     if (confirmado(ctx)) {
-        const telefone = CacheService.get<string>('telefone');
+        const telefone = CacheService.getPhone();
         const validation = validate('telefone', telefone);
         if (validation.temErro) {
             await ctx.reply(validation.mensagemDeErro);

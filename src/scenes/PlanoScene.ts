@@ -68,7 +68,7 @@ planoScene.use(async (ctx) => {
 });
 
 const savePlano = async (plano) => {
-    CacheService.saveUserData('plano', plano);
+    CacheService.savePlano(plano);
     log(`Plano definido ${plano}`);
 }
 

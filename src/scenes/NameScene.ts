@@ -11,7 +11,7 @@ nameScene.command('reiniciar', ctx => {
 })
 
 nameScene.enter(async (ctx) => {
-    if (!CacheService.get<string>('nome_completo')) {
+    if (!CacheService.getFullName()) {
         return await askForFullName(ctx);
     }
     await askForFullNameAgain(ctx);
@@ -39,14 +39,14 @@ const confirmFullName = async (ctx) => {
 
 const saveFullName = async (fullname) => {
     log('salvou o nome')
-    CacheService.saveUserData('nome_completo', fullname);
+    CacheService.saveFullName(fullname);
     log(`Nome completo definido ${fullname}`);
 }
 
 const confirmNameScene = new BaseScene('confirm_name');
 
 confirmNameScene.action('sim', async (ctx) => {
-    const nome = CacheService.get<string>('nome_completo');
+    const nome = CacheService.getFullName();
     await ctx.reply(`Beleza, ${nome.includes(' ') ? nome.substring(0, nome.indexOf(' ')) : nome}!`);
     return ctx.scene.enter('phone');
 });
@@ -57,7 +57,7 @@ confirmNameScene.action('nao', async (ctx) => {
 
 confirmNameScene.use(async (ctx) => {
     if (confirmado(ctx)) {
-        const nome = CacheService.get<string>('nome_completo');
+        const nome = CacheService.getFullName();
         await ctx.reply(`Beleza, ${nome.includes(' ') ? nome.substring(0, nome.indexOf(' ')) : nome}!`);
         return ctx.scene.enter('phone');
     }

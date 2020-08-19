@@ -45,7 +45,7 @@ paymentScene.use(async (ctx) => {
 });
 
 const savePaymentMethod = async (paymentMethod) => {
-    CacheService.saveUserData('forma_de_pagamento', paymentMethod);
+    CacheService.savePaymentMethod(paymentMethod);
     log(`Forma de pagamento definida ${paymentMethod}`);
 }
 

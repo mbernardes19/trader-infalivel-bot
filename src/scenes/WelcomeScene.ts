@@ -9,6 +9,7 @@ welcomeScene.command('reiniciar', ctx => {
 })
 
 welcomeScene.enter(async (ctx) => {
+    console.log(CacheService.getFullName());
     await welcome(ctx);
     await showPaymentOptions(ctx);
     await ctx.scene.enter('payment')
