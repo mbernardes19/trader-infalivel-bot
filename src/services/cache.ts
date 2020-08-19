@@ -91,7 +91,7 @@ export default class CacheService {
         this.save(key, value);
     }
 
-    private static save(key: string, value: any) {
+    static save(key: string, value: any) {
         this.cache.set(key, value);
     }
 

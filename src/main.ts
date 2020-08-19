@@ -11,16 +11,7 @@ dotEnv.config();
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
 const bot = new Telegraf(botToken);
 
-// INFOS
-// id telegram
-// código de cupom de desconto
-// código de plano
-// nome de usuario
-// nome completo (pedir)
-// telefone com DDD (pedir)
-// email
-// forma de pagamento (pedir)
-// qual plano comprado (pedir)
+CacheService.save('telegramClient', bot.telegram);
 
 bot.use(session())
 bot.use(MainStage.middleware())
