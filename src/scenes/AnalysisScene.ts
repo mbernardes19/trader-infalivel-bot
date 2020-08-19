@@ -106,7 +106,7 @@ const getUserData = async (ctx): Promise<UserData> => {
 
     userData.telegramId = ctx.chat.id;
     userData.discountCouponId = await getUserDiscountCoupon();
-    userData.username = ctx.message.from.username ? ctx.message.from.username : ctx.message.from.first_name;
+    userData.username = ctx.message ? (ctx.message.from.username ? ctx.message.from.username : ctx.message.from.first_name) : ctx.update.message.from.username;
     userData.paymentMethod = CacheService.getPaymentMethod();
     userData.plano = CacheService.getPlano();
     userData.fullName = CacheService.getFullName();
