@@ -1,4 +1,4 @@
-import { BaseScene, Context, Markup, Extra } from 'telegraf';
+import Telegraf, { BaseScene, Context, Markup, Extra, Telegram } from 'telegraf';
 import CacheService from '../services/cache';
 import { getDiscountCouponIdFromUser, verifyUserPurchase, checkIfPaymentMethodIsBoleto, confirmPlano, getDataAssinaturaFromUser } from '../services/monetizze';
 import UserData from '../model/UserData';
@@ -45,7 +45,6 @@ analysisScene.enter(async (ctx) => {
             const userData = await getUserData(ctx);
             const newUser = new User(userData);
             await saveUser(newUser);
-            await ctx.reply('Funfou');
             await enviarCanaisDeTelegram(ctx, userData.plano, userData.dataAssinatura);
             console.log(newUser);
         } catch (err) {
@@ -101,12 +100,15 @@ const getUserDataAssinatura = async () => {
     }
 }
 
-const getUserData = async (ctx): Promise<UserData> => {
+const getUserData = async (ctx: Context): Promise<UserData> => {
     const userData: UserData = new UserData();
+    const telegramClient = CacheService.get<Telegram>('telegramClient');
 
-    userData.telegramId = ctx.chat.id;
+    const chat = await telegramClient.getChat(ctx.chat.id)
+
+    userData.telegramId = ctx.chat.id.toString();
     userData.discountCouponId = await getUserDiscountCoupon();
-    userData.username = ctx.message ? (ctx.message.from.username ? ctx.message.from.username : ctx.message.from.first_name) : ctx.update.message.from.username;
+    userData.username = chat.username;
     userData.paymentMethod = CacheService.getPaymentMethod();
     userData.plano = CacheService.getPlano();
     userData.fullName = CacheService.getFullName();
