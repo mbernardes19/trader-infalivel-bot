@@ -3,10 +3,8 @@ import { Telegraf, Stage, session } from 'telegraf';
 import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
 import { log } from './logger';
-import { getMonetizzeProductTransaction } from './services/request'
 import CacheService from "./services/cache";
-import { isBefore } from "date-fns";
-dotEnv.config();
+dotEnv.config({path: '../.env'});
 
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
 const bot = new Telegraf(botToken);
