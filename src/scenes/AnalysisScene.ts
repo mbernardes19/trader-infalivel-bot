@@ -128,6 +128,10 @@ const getUserData = async (ctx): Promise<UserData> => {
 
 const saveUser = async (newUser) => {
     try {
+        console.log('host', process.env.DB_HOST)
+console.log('db', process.env.DB_DATABASE)
+console.log('user', process.env.DB_USER)
+console.log('pass', process.env.DB_PASSWORD)
         await addUserToDatabase(newUser, connection)
     } catch (err) {
         throw err;
