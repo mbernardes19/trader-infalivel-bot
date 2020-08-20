@@ -1,4 +1,8 @@
 import { Connection, createConnection } from 'mysql';
+import dotEnv from 'dotenv';
+import path from 'path';
+dotEnv.config({path: path.join(__dirname, '..', '.env')});
+
 
 let connection: Connection;
 

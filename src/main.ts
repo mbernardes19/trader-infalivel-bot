@@ -4,7 +4,8 @@ import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
 import { log } from './logger';
 import CacheService from "./services/cache";
-dotEnv.config({path: '../.env'});
+import path from 'path';
+dotEnv.config({path: path.join(__dirname, '..', '.env')});
 
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
 const bot = new Telegraf(botToken);
