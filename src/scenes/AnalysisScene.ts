@@ -101,7 +101,7 @@ const getUserDataAssinatura = async () => {
     }
 }
 
-const getUserData = async (ctx: Context): Promise<UserData> => {
+const getUserData = async (ctx): Promise<UserData> => {
     const userData: UserData = new UserData();
     const telegramClient = CacheService.get<Telegram>('telegramClient');
     console.log('TELEGRAM CLIENT', telegramClient);

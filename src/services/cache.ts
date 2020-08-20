@@ -105,7 +105,6 @@ export default class CacheService {
 
     static clearAllUserData() {
         this.user = {};
-        this.cache.flushAll();
     }
 
 }
