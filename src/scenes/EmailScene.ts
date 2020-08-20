@@ -1,4 +1,4 @@
-import { BaseScene, Extra, Markup } from 'telegraf';
+import { BaseScene, Extra, Markup, Context } from 'telegraf';
 import CacheService from '../services/cache';
 import { log } from '../logger';
 import { confirmado, negado, validate } from '../services/validate';

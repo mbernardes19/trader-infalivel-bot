@@ -60,6 +60,7 @@ analysisScene.enter(async (ctx) => {
         } finally {
             await endConversation(ctx);
         }
+        return;
     } else {
         let isPaymentBoleto;
         try {
@@ -103,9 +104,10 @@ const getUserDataAssinatura = async () => {
 const getUserData = async (ctx: Context): Promise<UserData> => {
     const userData: UserData = new UserData();
     const telegramClient = CacheService.get<Telegram>('telegramClient');
-
+    console.log('TELEGRAM CLIENT', telegramClient);
     const chat = await telegramClient.getChat(ctx.chat.id)
-
+    console.log('CHAT', chat);
+    console.log('CTX', ctx)
     userData.telegramId = ctx.chat.id.toString();
     userData.discountCouponId = await getUserDiscountCoupon();
     userData.username = chat.username;
