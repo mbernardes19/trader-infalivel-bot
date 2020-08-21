@@ -66,4 +66,13 @@ const checkIfPaymentMethodIsBoleto = async (email) => {
     }
 }
 
-export { getDiscountCouponIdFromUser, verifyUserPurchase, confirmPlano, getDataAssinaturaFromUser, checkIfPaymentMethodIsBoleto }
+const getUsersNewStatusAssinatura = async () => {
+    try {
+        const response = await getMonetizzeProductTransaction()
+        return response.dados.map(dados => dados.assinatura.status)
+    } catch (err) {
+        throw err;
+    }
+}
+
+export { getDiscountCouponIdFromUser, verifyUserPurchase, confirmPlano, getDataAssinaturaFromUser, checkIfPaymentMethodIsBoleto, getUsersNewStatusAssinatura }

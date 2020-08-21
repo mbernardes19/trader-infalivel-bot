@@ -12,7 +12,7 @@ import { connection } from "./db";
 import { getChat } from './services/chatResolver';
 import { getChatInviteLink } from './services/chatInviteLink';
 import User from "./model/User";
-import { getMonetizzeProductTransaction } from './services/request'
+import { startCronJobs } from './services/cronjobs';
 
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
 const bot = new Telegraf(botToken);
@@ -20,6 +20,7 @@ const bot = new Telegraf(botToken);
 CacheService.save('telegramClient', bot.telegram);
 
 startChatLinkValidation();
+startCronJobs();
 
 bot.use(session())
 bot.use(MainStage.middleware())
