@@ -8,4 +8,5 @@ export default class UserData {
     phone: string;
     email: string;
     dataAssinatura: string;
+    statusAssinatura? :string
 }

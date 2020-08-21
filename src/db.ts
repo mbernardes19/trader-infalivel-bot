@@ -3,13 +3,7 @@ import dotEnv from 'dotenv';
 import path from 'path';
 dotEnv.config({path: path.join(__dirname, '..', '.env')});
 
-
 let connection: Connection;
-
-console.log(process.env.DB_HOST)
-console.log(process.env.DB_DATABASE)
-console.log(process.env.DB_USER)
-console.log(process.env.DB_PASSWORD)
 
 if (process.env.NODE_ENV === 'production') {
     connection = createConnection({
@@ -17,6 +11,7 @@ if (process.env.NODE_ENV === 'production') {
         database: process.env.DB_DATABASE,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
+        dateStrings: true
     })
 } else {
     connection = createConnection({

@@ -32,12 +32,12 @@ const verifyUserPurchase = async (email) => {
             if (responseFinalizadas.recordCount === "0") {
                 return false;
             }
-            if (responseFinalizadas.dados[0].assinatura.status !== 'Ativa') {
+            if (responseFinalizadas.dados[0].assinatura && responseFinalizadas.dados[0].assinatura.status !== 'Ativa') {
                 return false;
             }
             return true;
        }
-       if (responseCompletas.dados[0].assinatura.status !== 'Ativa') {
+       if (responseCompletas.dados[0].assinatura && responseCompletas.dados[0].assinatura.status !== 'Ativa') {
            return false;
        }
        return true;

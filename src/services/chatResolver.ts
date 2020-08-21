@@ -1,9 +1,8 @@
 import { getMonetizzeProductTransaction } from './request';
 import { isBefore } from 'date-fns'
 import { Planos } from '../model/Planos';
-import CacheService from './cache';
 
-export async function getChat(plano: string, dataAssinatura: string) {
+export async function getChat(plano: string, dataAssinatura: string): Promise<[string, string]> {
     console.log('DATA ASSINATURA', dataAssinatura);
     let chat;
     let chatName;
@@ -68,15 +67,6 @@ export async function getChat(plano: string, dataAssinatura: string) {
             return [chatName, chat]
         }
     }
-
-    // res.dados.map(dado => {
-    //     const dataAssinatura = dado.assinatura.data_assinatura
-    //     const ano = parseInt(dataAssinatura.substring(0,4), 10)
-    //     const mes = parseInt(dataAssinatura.substring(5,7),10)
-    //     const dia = parseInt(dataAssinatura.substring(8,10),10)
-    //     console.log(dado.assinatura.data_assinatura)
-    //     console.log(isBefore(new Date(ano, mes-1, dia), new Date(2020,7,6)))
-    // })
 }
 
 const checkIfIsBefore = (data1: string, data2:Date) => {

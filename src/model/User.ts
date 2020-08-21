@@ -10,4 +10,24 @@ export default class User {
     getUserData(): UserData {
         return this.userData
     }
+
+    static fromDatabaseResult(databaseResult: any): User {
+        try {
+            let userData: UserData = new UserData();
+            const { id_telegram, user_telegram, plano, cupom_desconto, nome_completo, telefone, email, forma_de_pagamento, data_assinatura, status_assinatura } = databaseResult
+            userData.telegramId = id_telegram
+            userData.username = user_telegram
+            userData.plano = plano
+            userData.discountCouponId = cupom_desconto
+            userData.fullName = nome_completo
+            userData.phone = telefone
+            userData.email = email
+            userData.paymentMethod = forma_de_pagamento
+            userData.dataAssinatura = data_assinatura
+            userData.statusAssinatura = status_assinatura
+            return new User(userData);
+        } catch (err) {
+            throw err;
+        }
+    }
 }

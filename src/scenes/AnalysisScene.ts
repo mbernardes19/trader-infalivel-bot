@@ -7,6 +7,7 @@ import { logError, log } from '../logger';
 import { addUserToDatabase } from '../dao';
 import { connection } from '../db';
 import { getChat } from '../services/chatResolver';
+import { getChatInviteLink } from '../services/chatInviteLink';
 
 const analysisScene = new BaseScene('analysis')
 
@@ -73,11 +74,10 @@ analysisScene.enter(async (ctx) => {
                 await ctx.reply('O plano que você selecionou não é o mesmo que consta na compra na Monetizze. Por favor comece nossa conversa novamente com /reiniciar e atribua o plano correto.');
                 return await endConversation(ctx);
             }
-            await ctx.reply('Verifiquei que sua compra no boleto ainda não foi aprovada.')
-            await ctx.reply('Inicie uma conversa comigo novamente em 1 a 3 dias úteis para ter acesso aos nossos canais!')
+            await ctx.reply('Sua compra foi iniciada, porém o seu boleto ainda não foi pago / compensado. Você pode ver o status do seu boleto acessando monetizze.com.br . Quando estiver compensado volte e inicie uma conversa comigo novamente!')
             return await endConversation(ctx);
         }
-        await ctx.reply('Nenhuma compra confirmada do seu usuário foi encontrada na Monetizze ou sua assinatura não está com status ativo.')
+        await ctx.reply('Nenhuma compra confirmada do seu usuário foi encontrada na Monetizze ou sua assinatura não está com status ativo.\n\nSe você realmente comprou, fale agora com o suporte ⤵️\n@diego_sti\n@julianocba\n@juliasantanana')
         return await endConversation(ctx);
     }
 })
@@ -141,21 +141,19 @@ console.log('pass', process.env.DB_PASSWORD)
 const enviarCanaisDeTelegram = async (ctx: Context, plano: string, dataAssinatura: string) => {
     const [chatName, chatId] = await getChat(plano, dataAssinatura);
     console.log('CHAAAAT', chatName, chatId);
-    let linkCanalGeral;
-    if (process.env.NODE_ENV === 'production') {
-        linkCanalGeral = await ctx.telegram.exportChatInviteLink(process.env.ID_CANAL_GERAL);
-    } else {
-        console.log('CANAL GERAL TESTE', process.env.ID_CANAL_TEST_GERAL)
-        linkCanalGeral = await ctx.telegram.exportChatInviteLink(process.env.ID_CANAL_TEST_GERAL);
-    }
-    const linkChatEspecifico = await ctx.telegram.exportChatInviteLink(chatId);
+
+    const linkChatEspecifico = getChatInviteLink(chatId);
+    const linkCanalGeral = getChatInviteLink(process.env.ID_CANAL_GERAL)
+    console.log('GERAL', linkCanalGeral)
+    console.log('ESPECIFICO', linkChatEspecifico)
 
     const teclado = Markup.inlineKeyboard([
         Markup.urlButton('Canal Geral', linkCanalGeral),
         Markup.urlButton(chatName, linkChatEspecifico)
     ])
-
-    return await ctx.reply('Seja bem-vindo(a)!', Extra.markup(teclado))
+    await ctx.reply('Seja bem-vindo(a)!')
+    await ctx.reply('Clique agora nos dois botões e acesse nossos canais o quanto antes, logo esses botões vão expirar ⤵️', Extra.markup(teclado))
+    return await ctx.reply('Caso eles já tenham expirado quando você clicar, utilize o comando /canais para recebê-los atualizados!');
 }
 
 const endConversation = async (ctx) => {

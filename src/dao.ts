@@ -13,4 +13,14 @@ const addUserToDatabase = async (user: User, connection: Connection) => {
     }
 }
 
-export { addUserToDatabase }
+const getUserByTelegramId = async (telegramId: string|number, connection: Connection) => {
+    const query = util.promisify(connection.query).bind(connection)
+    try {
+        const result = await query(`select * from Users where id_telegram='${telegramId}'`);
+        return result[0];
+    } catch (err) {
+        throw err
+    }
+}
+
+export { addUserToDatabase, getUserByTelegramId }
