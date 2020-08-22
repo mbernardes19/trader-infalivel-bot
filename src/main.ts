@@ -3,7 +3,7 @@ import { Telegraf, Stage, session, Extra, Markup } from 'telegraf';
 import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
 import { log } from './logger';
-import {getUserByTelegramId} from './dao';
+import {getUserByTelegramId, updateViewChats} from './dao';
 import CacheService from "./services/cache";
 import path from 'path';
 dotEnv.config({path: path.join(__dirname, '..', '.env')});
@@ -33,6 +33,9 @@ bot.command('canais', async ctx => {
         if (!dbUserResult) {
             return await ctx.reply('Você ainda não ativou sua assinatura Monetizze comigo.');
         }
+        if (dbUserResult.ver_canais >= 2) {
+            return await ctx.reply('Você já visualizou os canais 2 vezes!');
+        }
         const user = User.fromDatabaseResult(dbUserResult);
         if (user.getUserData().statusAssinatura !== 'ativa') {
             return await ctx.reply('Você já ativou sua assinatura Monetizze comigo, porém seu status de assinatura na Monetizze não está como ativo, regularize sua situação com a Monetizze para ter acesso aos canais.');
@@ -46,17 +49,27 @@ bot.command('canais', async ctx => {
             Markup.urlButton(chatName, specificChatInviteLink)
         ]);
         await ctx.reply('É pra já!', Extra.markup(teclado))
+        await updateViewChats(ctx.chat.id, connection);
     } catch (err) {
         log(err)
         await ctx.reply('Ocorreu um erro ao verificar sua assinatura Monetizze. Tente novamente mais tarde.')
     }
 });
 
+bot.command('suporte', async (ctx) => {
+    const teclado = Markup.inlineKeyboard([
+        [Markup.urlButton('👉 SUPORTE 1', 't.me/juliasantanana')],
+        [Markup.urlButton('👉 SUPORTE 2', 't.me/diego_sti')],
+        [Markup.urlButton('👉 SUPORTE 3', 't.me/julianocba')],
+    ]);
+    await ctx.reply('Para falar com o suporte, clique abaixo ⤵️', Extra.markup(teclado))
+});
+
 bot.on('message', async ctx => {
     if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
         return;
     }
-    ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/parar - Parar nossa conversa\n/reiniciar - Começar nossa conversa do zero')
+    await ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/parar - Parar nossa conversa\n/reiniciar - Começar nossa conversa do zero\n/suporte - Entrar em contato com nosso suporte')
 })
 bot.launch()
 

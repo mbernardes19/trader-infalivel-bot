@@ -128,10 +128,6 @@ const getUserData = async (ctx): Promise<UserData> => {
 
 const saveUser = async (newUser) => {
     try {
-        console.log('host', process.env.DB_HOST)
-console.log('db', process.env.DB_DATABASE)
-console.log('user', process.env.DB_USER)
-console.log('pass', process.env.DB_PASSWORD)
         await addUserToDatabase(newUser, connection)
     } catch (err) {
         throw err;
@@ -153,7 +149,7 @@ const enviarCanaisDeTelegram = async (ctx: Context, plano: string, dataAssinatur
     ])
     await ctx.reply('Seja bem-vindo(a)!')
     await ctx.reply('Clique agora nos dois botões e acesse nossos canais o quanto antes, logo esses botões vão expirar ⤵️', Extra.markup(teclado))
-    return await ctx.reply('Caso eles já tenham expirado quando você clicar, utilize o comando /canais para recebê-los atualizados!');
+    return await ctx.replyWithMarkdown('Caso eles já tenham expirado quando você clicar, utilize o comando /canais para recebê-los atualizados!\n\n*OBS.: Você só pode receber os canais por esse comando 2 vezes.*');
 }
 
 const endConversation = async (ctx) => {

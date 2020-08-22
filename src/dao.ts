@@ -79,4 +79,15 @@ const markUserAsKicked = async (telegramId: string|number, connection: Connectio
     }
 }
 
-export { addUserToDatabase, getUserByTelegramId, getAllValidUsers, getAllInvalidUsers, updateUsersStatusAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers }
+const updateViewChats = async (telegramId: string|number, connection: Connection) => {
+    const query = util.promisify(connection.query).bind(connection)
+    try {
+        const [dbResult] = await query(`select ver_canais from Users where id_telegram='${telegramId}'`);
+        const newVerCanais = parseInt(dbResult.ver_canais, 10) + 1;
+        await query(`update Users set ver_canais=${newVerCanais} where id_telegram='${telegramId}'`);
+    } catch (err) {
+        throw err;
+    }
+}
+
+export { addUserToDatabase, getUserByTelegramId, getAllValidUsers, getAllInvalidUsers, updateUsersStatusAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }
