@@ -3,7 +3,7 @@ import CacheService from '../services/cache';
 import { getDiscountCouponIdFromUser, verifyUserPurchase, checkIfPaymentMethodIsBoleto, confirmPlano, getDataAssinaturaFromUser } from '../services/monetizze';
 import UserData from '../model/UserData';
 import User from '../model/User';
-import { logError, log } from '../logger';
+import { logError, log, enviarMensagemDeErroAoAdmin } from '../logger';
 import { addUserToDatabase } from '../dao';
 import { connection } from '../db';
 import { getChat } from '../services/chatResolver';
@@ -37,6 +37,7 @@ analysisScene.enter(async (ctx) => {
         }
     } catch (err) {
         logError(`Erro ao verificar compra de usuário na Monetizze`, err)
+        await enviarMensagemDeErroAoAdmin(`Erro ao verificar compra de usuário na Monetizze`, err);
         await ctx.reply('Me desculpe... Ocorreu um erro ao verificar a sua compra na Monetizze. Por favor, tente iniciar uma conversa comigo novamente.');
         return await endConversation(ctx);
     }
@@ -57,6 +58,7 @@ analysisScene.enter(async (ctx) => {
         } catch (err) {
             if (err.errno === 1062) {
                 logError(`Usuário já existe no banco de dados`, err);
+                await enviarMensagemDeErroAoAdmin(`Usuário já existe no banco de dados`, err);
                 await ctx.reply(`Você já ativou sua assinatura Monettize comigo antes.`)
                 return await endConversation(ctx);
             } else {
@@ -70,6 +72,7 @@ analysisScene.enter(async (ctx) => {
             isPaymentBoleto = await checkIfPaymentMethodIsBoleto(email);
         } catch (err) {
             logError(`ERRO AO VERIFICAR SE PAGAMENTO FOI FEITO NO BOLETO E ESTÁ AGUARDANDO PAGAMENTO`, err)
+            await enviarMensagemDeErroAoAdmin(`ERRO AO VERIFICAR SE PAGAMENTO FOI FEITO NO BOLETO E ESTÁ AGUARDANDO PAGAMENTO`, err);
             await ctx.reply('Desculpe, ocorreu um erro ao verificar se pagamento foi feito no boleto. Tente iniciar uma conversa comigo novamente usando o comando /reiniciar')
         }
         if (isPaymentBoleto) {
@@ -131,6 +134,8 @@ const getUserData = async (ctx): Promise<UserData> => {
         return userData;
     } catch (err) {
         logError(`ERRO AO PEGAR DADOS DE USUÁRIO ${ctx.chat.id}`, err);
+        await enviarMensagemDeErroAoAdmin(`ERRO AO PEGAR DADOS DE USUÁRIO ${ctx.chat.id}`, err);
+
     }
 }
 
@@ -140,6 +145,7 @@ const saveUser = async (newUser: User) => {
         await addUserToDatabase(newUser, connection)
     } catch (err) {
         logError(`ERRO AO SALVAR USUÁRIO NO BANCO DE DADOS ${newUser.getUserData().telegramId}`, err)
+        await enviarMensagemDeErroAoAdmin(`ERRO AO SALVAR USUÁRIO NO BANCO DE DADOS ${newUser.getUserData().telegramId}`, err);
         throw err;
     }
 }
@@ -156,6 +162,7 @@ const enviarCanaisDeTelegram = async (ctx: Context, plano: string, dataAssinatur
         linkCanalGeral = getChatInviteLink(process.env.ID_CANAL_GERAL)
     } catch (err) {
         logError(`ERRO AO ENVIAR CANAIS DE TELEGRAM`, err)
+        await enviarMensagemDeErroAoAdmin(`ERRO AO ENVIAR CANAIS DE TELEGRAM`, err);
         throw err;
     }
 

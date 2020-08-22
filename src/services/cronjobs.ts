@@ -4,7 +4,7 @@ import { connection } from '../db';
 import CacheService from './cache';
 import { Telegram } from 'telegraf';
 import { getChat } from './chatResolver';
-import { log, logError } from '../logger';
+import { log, logError, enviarMensagemDeErroAoAdmin } from '../logger';
 
 const startCronJobs = () => {
     try {
@@ -42,6 +42,7 @@ const removeInvalidUsersAtEveryTime = () => {
             log(`⏱️ Pegando chats com usuários inválidos ${chatIds}`)
         } catch (err) {
             logError(`⏱️ ERRO AO PEGAR CHATS COM USUÁRIOS INVÁLIDOS ${invalidUsers}`, err)
+            await enviarMensagemDeErroAoAdmin(`⏱️ ERRO AO PEGAR CHATS COM USUÁRIOS INVÁLIDOS ${invalidUsers}`, err);
             throw err;
         }
 
@@ -56,6 +57,7 @@ const removeInvalidUsersAtEveryTime = () => {
             log(`⏱️ Usuários inválidos removidos ${usersToKick}`)
         } catch (err) {
             logError(`⏱️ ERRO AO REMOVER USUÁRIOS INVÁLIDOS ${usersToKick}`, err)
+            await enviarMensagemDeErroAoAdmin(`⏱️ ERRO AO REMOVER USUÁRIOS INVÁLIDOS ${usersToKick}`, err)
             throw err;
         }
     });
@@ -73,6 +75,7 @@ const updateValidUsersStatusAssinaturaAtEveryTime = () => {
             await updateUsersStatusAssinatura(allUsers, connection);
         } catch (err) {
             logError(`⏱️ ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS VÁLIDOS ${allUsers}`, err)
+            enviarMensagemDeErroAoAdmin(`⏱️ ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS VÁLIDOS ${allUsers}`, err)
             throw err;
         }
     });

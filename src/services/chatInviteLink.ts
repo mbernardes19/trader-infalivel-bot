@@ -1,6 +1,6 @@
 import { Telegram } from 'telegraf';
 import CacheService from '../services/cache';
-import { log, logError } from '../logger';
+import { log, logError, enviarMensagemDeErroAoAdmin } from '../logger';
 
 const { ID_CANAL_GERAL, ID_CANAL_SILVER, ID_CANAL_GOLD, ID_CANAL_DIAMOND, ID_GRUPO_BLACK_DIAMOND } = process.env
 
@@ -23,6 +23,7 @@ const exportChatsInviteLink = async () => {
         log(`🔗💬 GERAL: ${linkCanalGeral}, SILVER: ${linkCanalSilver}, GOLD: ${linkCanalGold}, DIAMOND: ${linkCanalDiamond}, BLACK DIAMOND: ${linkGrupoBlackDiamond}`)
     } catch (err) {
         logError(`ERRO AO GERAR NOVOS LINKS PARA CHATS`, err)
+        await enviarMensagemDeErroAoAdmin(`ERRO AO GERAR NOVOS LINKS PARA CHATS`, err)
     }
 }
 

@@ -1,7 +1,19 @@
+import { Telegram } from "telegraf";
+import CacheService from './services/cache';
 
 const logError = (message: string|string[], error: any) => {
     const time = getTimeString();
     console.log(time, 'ERROR', message, error);
+}
+
+const enviarMensagemDeErroAoAdmin = async (mensagemErro: string, erro: any) => {
+    let telegramClient;
+    try {
+        telegramClient = CacheService.get<Telegram>('telegramClient');
+        await telegramClient.sendMessage('721557882', `${mensagemErro}\n\n${erro}`);
+    } catch (err) {
+        logError(`ERRO AO ENVIAR MENSAGEM DE ERRO AO ADMIN`, err);
+    }
 }
 
 const logWarning = (message: string|string[]) => {
@@ -25,4 +37,4 @@ const getTimeString = (): string => {
     return `[${day}-${month}-${year} ${hour}:${minute}:${second}::${millisseconds}]`;
 }
 
-export { log, logWarning, logError }
+export { log, logWarning, logError, enviarMensagemDeErroAoAdmin }

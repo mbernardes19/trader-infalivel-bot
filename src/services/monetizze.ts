@@ -91,7 +91,7 @@ const getUsersNewStatusAssinatura = async (users: User[]) => {
         const usersToUpdate: MonetizzeTransactionResponse[] = await Promise.all(usersToUpdatePromise)
         return usersToUpdate.map(user => user.dados[0].assinatura.status.toString().toLowerCase().replace(/' '/g, '_'))
     } catch (err) {
-        logError(`ERRO AO PEGAR NOVO STATUS DE ASSINATURA DE USUÁRIOS ${users}`, err)
+        logError(`ERRO AO PEGAR NOVO STATUS DE ASSINATURA DE USUÁRIOS ${users}`, err);
         throw err;
     }
 }
