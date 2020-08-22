@@ -4,11 +4,16 @@ import { connection } from '../db';
 import CacheService from './cache';
 import { Telegram } from 'telegraf';
 import { getChat } from './chatResolver';
+import { log, logError } from '../logger';
 
 const startCronJobs = () => {
-    removeInvalidUsersAtEveryTime();
-    updateValidUsersStatusAssinaturaAtEveryTime();
-    updateValidUsersStatusAssinaturaAtEveryTime();
+    try {
+        removeInvalidUsersAtEveryTime();
+        updateValidUsersStatusAssinaturaAtEveryTime();
+        updateValidUsersStatusAssinaturaAtEveryTime();
+    } catch (err) {
+        logError(`ERRO AO EXECUTAR CRONJOB`, err)
+    }
 }
 
 const removeInvalidUsersAtEveryTime = () => {
@@ -16,16 +21,27 @@ const removeInvalidUsersAtEveryTime = () => {
     const telegramClient = CacheService.get<Telegram>('telegramClient');
 
     Cron.schedule(each15Minutes, async () => {
+        log(`⏱️ Iniciando cronjob para remover usuários inválidos`)
         const usersToKick = []
         const chatIdsPromises = []
-        const invalidUsers = await getAllInvalidNonKickedUsers(connection);
+
+        let invalidUsers;
+        try {
+            invalidUsers = await getAllInvalidNonKickedUsers(connection);
+            log(`⏱️ Pegando usuários inválidos ${invalidUsers}`)
+        } catch (err) {
+            throw err;
+        }
         invalidUsers.forEach(invalidUser => {
             chatIdsPromises.push(getChat(invalidUser.plano, invalidUser.data_assinatura))
         })
+
         let chatIds;
         try {
             chatIds = await Promise.all(chatIdsPromises);
+            log(`⏱️ Pegando chats com usuários inválidos ${chatIds}`)
         } catch (err) {
+            logError(`⏱️ ERRO AO PEGAR CHATS COM USUÁRIOS INVÁLIDOS ${invalidUsers}`, err)
             throw err;
         }
 
@@ -37,7 +53,9 @@ const removeInvalidUsersAtEveryTime = () => {
 
         try {
             await Promise.all(usersToKick);
+            log(`⏱️ Usuários inválidos removidos ${usersToKick}`)
         } catch (err) {
+            logError(`⏱️ ERRO AO REMOVER USUÁRIOS INVÁLIDOS ${usersToKick}`, err)
             throw err;
         }
     });
@@ -47,8 +65,16 @@ const updateValidUsersStatusAssinaturaAtEveryTime = () => {
     const eachHour = '0 */1 * * *';
 
     Cron.schedule(eachHour, async () => {
-        const allUsers = await getAllValidUsers(connection);
-        await updateUsersStatusAssinatura(allUsers, connection);
+        log(`⏱️ Iniciando cronjob para atualizar status de assinatura de usuários válidos`)
+
+        let allUsers = [];
+        try {
+            allUsers = await getAllValidUsers(connection);
+            await updateUsersStatusAssinatura(allUsers, connection);
+        } catch (err) {
+            logError(`⏱️ ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS VÁLIDOS ${allUsers}`, err)
+            throw err;
+        }
     });
 }
 
