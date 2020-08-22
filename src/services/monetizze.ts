@@ -1,5 +1,5 @@
 import { getMonetizzeProductTransaction } from './request';
-import { log } from '../logger';
+import { log, logError } from '../logger';
 import CacheService from './cache';
 import User from '../model/User';
 import { MonetizzeTransaction, MonetizzeTransactionResponse } from '../interfaces/Monetizze'
@@ -27,33 +27,41 @@ const getDataAssinaturaFromUser = async (userEmail: string) => {
 
 const verifyUserPurchase = async (email) => {
     try {
-        const responseCompletas = await getMonetizzeProductTransaction({ email, "status[]": 2 })
-        log(`Verificando compra de usuário na Monetizze ${JSON.stringify(responseCompletas)}`)
-        if (responseCompletas.recordCount === "0") {
-            const responseFinalizadas = await getMonetizzeProductTransaction({ email, "status[]": 6 })
-            if (responseFinalizadas.recordCount === "0") {
+        const responseFinalizada = await getMonetizzeProductTransaction({ email, "status[]": 2 })
+        log(`Verificando compra de usuário na Monetizze ${email}`)
+        if (responseFinalizada.recordCount === "0") {
+            log(`${email} não tem compras finalizadas`)
+            const responseCompleta = await getMonetizzeProductTransaction({ email, "status[]": 6 })
+            if (responseCompleta.recordCount === "0") {
+                log(`${email} não tem compras completas`)
                 return false;
             }
-            if (responseFinalizadas.dados[0].assinatura && responseFinalizadas.dados[0].assinatura.status !== 'Ativa') {
+            if (responseCompleta.dados[0].assinatura && responseCompleta.dados[0].assinatura.status !== 'Ativa') {
+                log(`${email} tem compra completa, mas assinatura não está ativa`)
                 return false;
             }
+            log(`${email} tem compra completa e com assinatura ativa!`)
             return true;
        }
-       if (responseCompletas.dados[0].assinatura && responseCompletas.dados[0].assinatura.status !== 'Ativa') {
+       if (responseFinalizada.dados[0].assinatura && responseFinalizada.dados[0].assinatura.status !== 'Ativa') {
+           log(`${email} tem compra finalizada, mas assinatura não está ativa`)
            return false;
        }
+       log(`${email} tem compra finalizada e com assinatura ativa!`)
        return true;
     } catch (err) {
+        logError(`ERRO AO VERIFICAR COMPRA DE ${email}`, err)
         throw err
     }
 }
 
 const confirmPlano = async (email) => {
     try {
+        log(`Confirmando plano de usuário na Monetizze ${email}`)
         const responseCompletas = await getMonetizzeProductTransaction({ email })
-        log(`Confirmando plano de usuário na Monetizze ${JSON.stringify(responseCompletas)}`)
         return responseCompletas.dados[0].plano.codigo !== CacheService.getPlano() ? false : true;
     } catch (err) {
+        logError(`ERRO AO VERIFICAR PLANO NA COMPRA DE ${email}`, err)
         throw err
     }
 }
@@ -61,7 +69,7 @@ const confirmPlano = async (email) => {
 const checkIfPaymentMethodIsBoleto = async (email) => {
     try {
         const response = await getMonetizzeProductTransaction({ email, "forma_pagamento[]": 3, "status[]": 1 })
-        log(`Verificando se a compra na Monetizze foi feita por boleto e está aguardando pagamento ${JSON.stringify(response)}`)
+        log(`Verificando se a compra na Monetizze de ${email} foi feita por boleto e está aguardando pagamento`)
         return response.recordCount === "0" ? false : true;
     } catch (err) {
         throw err;

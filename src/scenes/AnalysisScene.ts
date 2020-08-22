@@ -1,4 +1,4 @@
-import Telegraf, { BaseScene, Context, Markup, Extra, Telegram } from 'telegraf';
+import { BaseScene, Context, Markup, Extra, Telegram } from 'telegraf';
 import CacheService from '../services/cache';
 import { getDiscountCouponIdFromUser, verifyUserPurchase, checkIfPaymentMethodIsBoleto, confirmPlano, getDataAssinaturaFromUser } from '../services/monetizze';
 import UserData from '../model/UserData';
@@ -12,11 +12,13 @@ import { getChatInviteLink } from '../services/chatInviteLink';
 const analysisScene = new BaseScene('analysis')
 
 analysisScene.command('reiniciar', ctx => {
+    log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return ctx.scene.enter('welcome')
 })
 
 analysisScene.command('parar', async ctx => {
+    log(`Parando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return await ctx.scene.leave()
 })
@@ -27,8 +29,10 @@ analysisScene.enter(async (ctx) => {
     let isPurchaseApproved;
     let isPlanoConfirmed;
     try {
+        log(`Iniciando análise de compra ${ctx.chat.id}`)
         isPurchaseApproved = await verifyUserPurchase(email);
         if (isPurchaseApproved) {
+            log(`Compra confirmada! ${ctx.chat.id}`)
             isPlanoConfirmed = await confirmPlano(email);
         }
     } catch (err) {
@@ -39,15 +43,17 @@ analysisScene.enter(async (ctx) => {
 
     if (isPurchaseApproved) {
         if (!isPlanoConfirmed) {
+            log(`Compra de ${ctx.chat.id} foi confirmada, mas o plano informado não é o mesmo da compra`)
             await ctx.reply('O plano que você selecionou não é o mesmo que consta na compra na Monetizze. Por favor comece nossa conversa novamente com /reiniciar e atribua o plano correto.');
             return await endConversation(ctx);
         }
+        log(`Compra e plano de ${ctx.chat.id} foram confirmados!`)
         try {
             const userData = await getUserData(ctx);
             const newUser = new User(userData);
             await saveUser(newUser);
             await enviarCanaisDeTelegram(ctx, userData.plano, userData.dataAssinatura);
-            console.log(newUser);
+            await endConversation(ctx);
         } catch (err) {
             if (err.errno === 1062) {
                 logError(`Usuário já existe no banco de dados`, err);
@@ -57,26 +63,27 @@ analysisScene.enter(async (ctx) => {
                 await ctx.reply(`Sua compra na Monetizze foi confirmada, porém ocorreu um erro ao ativar sua assinatura na Monetizze.`)
                 return await endConversation(ctx);
             }
-        } finally {
-            await endConversation(ctx);
         }
-        return;
     } else {
         let isPaymentBoleto;
         try {
             isPaymentBoleto = await checkIfPaymentMethodIsBoleto(email);
         } catch (err) {
-            logError('Desculpe, ocorreu um erro ao verificar se pagamento foi feito no boleto. Tente iniciar uma conversa comigo de novo', err)
+            logError(`ERRO AO VERIFICAR SE PAGAMENTO FOI FEITO NO BOLETO E ESTÁ AGUARDANDO PAGAMENTO`, err)
+            await ctx.reply('Desculpe, ocorreu um erro ao verificar se pagamento foi feito no boleto. Tente iniciar uma conversa comigo novamente usando o comando /reiniciar')
         }
         if (isPaymentBoleto) {
+            log(`Pagamento de ${ctx.chat.id} foi em boleto e está aguardando pagamento`)
             if (!isPlanoConfirmed) {
+                log(`Plano informado por ${ctx.chat.id} não é o mesmo da compra`)
                 await ctx.reply('O plano que você selecionou não é o mesmo que consta na compra na Monetizze. Por favor comece nossa conversa novamente com /reiniciar e atribua o plano correto.');
                 return await endConversation(ctx);
             }
-            await ctx.reply('Sua compra foi iniciada, porém o seu boleto ainda não foi pago / compensado. Você pode ver o status do seu boleto acessando monetizze.com.br . Quando estiver compensado volte e inicie uma conversa comigo novamente!')
+            await ctx.reply('Sua compra foi iniciada, porém o seu boleto ainda não foi pago/compensado. Você pode ver o status do seu boleto acessando monetizze.com.br . Quando estiver compensado volte e inicie uma conversa comigo novamente!')
             return await endConversation(ctx);
         }
-        await ctx.reply('Nenhuma compra confirmada do seu usuário foi encontrada na Monetizze ou sua assinatura não está com status ativo.\n\nSe você realmente comprou, fale agora com o suporte ⤵️\n@diego_sti\n@julianocba\n@juliasantanana')
+        log(`Nenhuma compra feita pelo usuário ${ctx.chat.id} foi encontrada`)
+        await ctx.reply('Nenhuma compra confirmada do seu usuário foi encontrada na Monetizze ou sua assinatura não está com status ativo.\n\nSe você realmente comprou, entre em contato com o suporte usando o comando /suporte')
         return await endConversation(ctx);
     }
 })
@@ -84,49 +91,56 @@ analysisScene.enter(async (ctx) => {
 const getUserDiscountCoupon = async () => {
     const email = CacheService.getEmail();
     const plano = CacheService.getPlano();
+    log(`Pegando cupom de desconto de usuário ${email}`)
     try {
         return await getDiscountCouponIdFromUser(email, plano)
     } catch (err) {
-        logError(`Erro ao pegar cupom de desconto do usuário ${email}`, err)
+        logError(`ERRO AO PEGAR CUPOM DE DESCONTO DO USUÁRIO ${email}`, err)
+        throw err;
     }
 }
 
 const getUserDataAssinatura = async () => {
     const email = CacheService.getEmail();
+    log(`Pegando data de assinatura de usuário ${email}`)
     try {
         return await getDataAssinaturaFromUser(email);
     } catch (err) {
-        logError(`Erro ao pegar data de assinatura do usuário ${email}`, err)
+        logError(`ERRO AO PEGAR DATA DE ASSINATURA DO USUÁRIO ${email}`, err)
+        throw err;
     }
 }
 
 const getUserData = async (ctx): Promise<UserData> => {
-    const userData: UserData = new UserData();
-    const telegramClient = CacheService.get<Telegram>('telegramClient');
-    console.log('TELEGRAM CLIENT', telegramClient);
-    const chat = await telegramClient.getChat(ctx.chat.id)
-    console.log('CHAT', chat);
-    console.log('CTX', ctx)
-    userData.telegramId = ctx.chat.id.toString();
-    userData.discountCouponId = await getUserDiscountCoupon();
-    userData.username = chat.username;
-    userData.paymentMethod = CacheService.getPaymentMethod();
-    userData.plano = CacheService.getPlano();
-    userData.fullName = CacheService.getFullName();
-    userData.phone = CacheService.getPhone();
-    userData.email = CacheService.getEmail();
-    userData.dataAssinatura = await getUserDataAssinatura();
+    log(`Pegando dados de usuário ${ctx.chat.id}`);
+    try {
+        const userData: UserData = new UserData();
+        const telegramClient = CacheService.get<Telegram>('telegramClient');
+        const chat = await telegramClient.getChat(ctx.chat.id)
+        userData.telegramId = ctx.chat.id.toString();
+        userData.discountCouponId = await getUserDiscountCoupon();
+        userData.username = chat.username;
+        userData.paymentMethod = CacheService.getPaymentMethod();
+        userData.plano = CacheService.getPlano();
+        userData.fullName = CacheService.getFullName();
+        userData.phone = CacheService.getPhone();
+        userData.email = CacheService.getEmail();
+        userData.dataAssinatura = await getUserDataAssinatura();
 
-    log(`Username Telegram definido ${userData.username}`)
-    log(`Id Telegram definido ${userData.telegramId}`)
-    log(`Cupom de desconto definido ${userData.discountCouponId}`)
-    log(`Data de assinatura definida ${userData.dataAssinatura}`)
+        log(`Username Telegram definido ${userData.username}`)
+        log(`Id Telegram definido ${userData.telegramId}`)
+        log(`Cupom de desconto definido ${userData.discountCouponId}`)
+        log(`Data de assinatura definida ${userData.dataAssinatura}`)
 
-    return userData;
+        return userData;
+    } catch (err) {
+        logError(`ERRO AO PEGAR DADOS DE USUÁRIO ${ctx.chat.id}`, err);
+    }
 }
 
 const saveUser = async (newUser: User) => {
     try {
+        log(`Adicionando usuário ${newUser.getUserData().telegramId} ao banco de dados`)
         await addUserToDatabase(newUser, connection)
     } catch (err) {
         logError(`ERRO AO SALVAR USUÁRIO NO BANCO DE DADOS ${newUser.getUserData().telegramId}`, err)
@@ -135,13 +149,22 @@ const saveUser = async (newUser: User) => {
 }
 
 const enviarCanaisDeTelegram = async (ctx: Context, plano: string, dataAssinatura: string) => {
-    const [chatName, chatId] = await getChat(plano, dataAssinatura);
-    console.log('CHAAAAT', chatName, chatId);
+    let chatName;
+    let chatId;
+    let linkChatEspecifico;
+    let linkCanalGeral;
+    log(`Enviando canais de Telegram para usuário ${ctx.chat.id}`)
+    try {
+        [chatName, chatId] = await getChat(plano, dataAssinatura);
+        linkChatEspecifico = getChatInviteLink(chatId);
+        linkCanalGeral = getChatInviteLink(process.env.ID_CANAL_GERAL)
+    } catch (err) {
+        logError(`ERRO AO ENVIAR CANAIS DE TELEGRAM`, err)
+        throw err;
+    }
 
-    const linkChatEspecifico = getChatInviteLink(chatId);
-    const linkCanalGeral = getChatInviteLink(process.env.ID_CANAL_GERAL)
-    console.log('GERAL', linkCanalGeral)
-    console.log('ESPECIFICO', linkChatEspecifico)
+    log(`Canal Geral enviado para ${ctx.chat.id}`)
+    log(`Canal Específico (${plano}) enviado para ${ctx.chat.id}`)
 
     const teclado = Markup.inlineKeyboard([
         Markup.urlButton('Canal Geral', linkCanalGeral),
@@ -153,6 +176,7 @@ const enviarCanaisDeTelegram = async (ctx: Context, plano: string, dataAssinatur
 }
 
 const endConversation = async (ctx) => {
+    log(`Conversa com ${ctx.chat.id} finalizada`)
     CacheService.clearAllUserData();
     return ctx.scene.leave();
 }
