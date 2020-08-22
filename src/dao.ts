@@ -2,7 +2,7 @@ import util from 'util';
 import { Connection } from 'mysql';
 import User from './model/User';
 import { getUsersNewStatusAssinatura } from './services/monetizze';
-import { logError } from './logger';
+import { log, logError } from './logger';
 
 
 const addUserToDatabase = async (user: User, connection: Connection) => {
@@ -60,14 +60,22 @@ const getAllInvalidUsers = async (connection: Connection) => {
 }
 
 const updateUsersStatusAssinatura = async (users: User[], connection: Connection) => {
+    log(`Iniciando atualização de status de usuários ${users}`)
     const query = util.promisify(connection.query).bind(connection);
-    const newStatusAssinatura = await getUsersNewStatusAssinatura(users);
+    let newStatusAssinatura;
+    try {
+        newStatusAssinatura = await getUsersNewStatusAssinatura(users);
+    } catch (err) {
+        throw err;
+    }
+
     const updates = []
     users.forEach((user, index) => {
         updates.push(query(`update Users set status_assinatura='${newStatusAssinatura[index]}' where id_telegram='${user.getUserData().telegramId}'`));
     })
     try {
         await Promise.all(updates);
+        log(`Atualização de status realizada com sucesso!`)
     } catch (err) {
         logError(`ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS ${users}`, err);
         throw err;
@@ -77,7 +85,8 @@ const updateUsersStatusAssinatura = async (users: User[], connection: Connection
 const markUserAsKicked = async (telegramId: string|number, connection: Connection) => {
     const query = util.promisify(connection.query).bind(connection)
     try {
-        return await query(`update Users set kickado='S' where id_telegram='${telegramId}'`);
+        await query(`update Users set kickado='S' where id_telegram='${telegramId}'`);
+        log(`Usuários ${telegramId} marcado como kickado`);
     } catch (err) {
         logError(`ERRO AO MARCAR USUÁRIO COMO KICKADO ${telegramId}`, err);
         throw err;
