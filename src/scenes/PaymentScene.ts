@@ -5,12 +5,16 @@ import { cartao, boleto } from '../services/validate';
 
 const paymentScene = new BaseScene('payment')
 
+log(`Entrando em cena de FORMA DE PAGAMENTO`)
+
 paymentScene.command('reiniciar', ctx => {
+    log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return ctx.scene.enter('welcome')
 })
 
 paymentScene.command('parar', async ctx => {
+    log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return await ctx.scene.leave()
 })
@@ -55,6 +59,7 @@ const savePaymentMethod = async (paymentMethod) => {
 }
 
 const showPlanoOptions = async (ctx) => {
+    log(`Enviando opções de PLANO para ${ctx.chat.id}`)
     const planos = Markup.inlineKeyboard([
         [Markup.callbackButton('🥈 Prata/Silver', '78914')],
         [Markup.callbackButton('🥇 Gold', '90965')],

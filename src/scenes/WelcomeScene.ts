@@ -20,6 +20,7 @@ welcomeScene.command('parar', async ctx => {
 })
 
 welcomeScene.enter(async (ctx) => {
+    log(`Entrando em cena de BOAS VINDAS por ${ctx.chat.id}`)
     if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
         return await ctx.scene.leave();
     }
@@ -35,7 +36,7 @@ const welcome = async (ctx) => {
 }
 
 const showPaymentOptions = async (ctx) => {
-    log(`Enviando opções de pagamento para ${ctx.chat.id}`)
+    log(`Enviando opções de PAGAMENTO para ${ctx.chat.id}`)
     const pagamento = Markup.inlineKeyboard([
         [Markup.callbackButton('💳 Cartão de Crédito', 'cartao_de_credito')],
         [Markup.callbackButton('📄 Boleto', 'boleto')]
