@@ -1,6 +1,5 @@
 import Cron from 'node-cron';
-// import {get} from './monetizze';
-import { getAllInvalidUsers } from '../dao';
+import { getAllInvalidNonKickedUsers, markUserAsKicked, getAllValidUsers, updateUsersStatusAssinatura } from '../dao';
 import { connection } from '../db';
 import CacheService from './cache';
 import { Telegram } from 'telegraf';
@@ -8,7 +7,8 @@ import { getChat } from './chatResolver';
 
 const startCronJobs = () => {
     removeInvalidUsersAtEveryTime();
-    updateUsersStatusAssinaturaAtEveryTime();
+    updateValidUsersStatusAssinaturaAtEveryTime();
+    updateValidUsersStatusAssinaturaAtEveryTime();
 }
 
 const removeInvalidUsersAtEveryTime = () => {
@@ -18,7 +18,7 @@ const removeInvalidUsersAtEveryTime = () => {
     Cron.schedule(each15Minutes, async () => {
         const usersToKick = []
         const chatIdsPromises = []
-        const invalidUsers = await getAllInvalidUsers(connection);
+        const invalidUsers = await getAllInvalidNonKickedUsers(connection);
         invalidUsers.forEach(invalidUser => {
             chatIdsPromises.push(getChat(invalidUser.plano, invalidUser.data_assinatura))
         })
@@ -32,6 +32,7 @@ const removeInvalidUsersAtEveryTime = () => {
         invalidUsers.forEach((invalidUser, index) => {
             usersToKick.push(telegramClient.kickChatMember(process.env.ID_CANAL_GERAL, invalidUser.id_telegram));
             usersToKick.push(telegramClient.kickChatMember(chatIds[index][1], invalidUser.id_telegram));
+            usersToKick.push(markUserAsKicked(invalidUser.id_telegram, connection))
         })
 
         try {
@@ -42,10 +43,13 @@ const removeInvalidUsersAtEveryTime = () => {
     });
 }
 
-const updateUsersStatusAssinaturaAtEveryTime = () => {
+const updateValidUsersStatusAssinaturaAtEveryTime = () => {
     const eachHour = '0 */1 * * *';
-    Cron.schedule(eachHour, () => {
-        
+
+    Cron.schedule(eachHour, async () => {
+        const allUsers = await getAllValidUsers(connection);
+        console.log('all users', allUsers)
+        await updateUsersStatusAssinatura(allUsers, connection);
     });
 }
 

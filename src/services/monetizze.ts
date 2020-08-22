@@ -1,6 +1,8 @@
 import { getMonetizzeProductTransaction } from './request';
 import { log } from '../logger';
 import CacheService from './cache';
+import User from '../model/User';
+import { MonetizzeTransaction, MonetizzeTransactionResponse } from '../interfaces/Monetizze'
 
 const getDiscountCouponIdFromUser = async (userEmail, userPlano) => {
     try {
@@ -66,10 +68,15 @@ const checkIfPaymentMethodIsBoleto = async (email) => {
     }
 }
 
-const getUsersNewStatusAssinatura = async () => {
+const getUsersNewStatusAssinatura = async (users: User[]) => {
+    const usersToUpdatePromise = [];
+    users.forEach(user => {
+        const { email } = user.getUserData();
+        usersToUpdatePromise.push(getMonetizzeProductTransaction({email}))
+    })
     try {
-        const response = await getMonetizzeProductTransaction()
-        return response.dados.map(dados => dados.assinatura.status)
+        const usersToUpdate: MonetizzeTransactionResponse[] = await Promise.all(usersToUpdatePromise)
+        return usersToUpdate.map(user => user.dados[0].assinatura.status.toString().toLowerCase().replace(/' '/g, '_'))
     } catch (err) {
         throw err;
     }

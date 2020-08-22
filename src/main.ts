@@ -24,6 +24,7 @@ startCronJobs();
 
 bot.use(session())
 bot.use(MainStage.middleware())
+bot.on('new_chat_members', (ctx) => console.log(ctx.message.new_chat_members))
 bot.command('start', Stage.enter('welcome'))
 bot.command('reiniciar', Stage.enter('welcome'))
 bot.command('canais', async ctx => {
