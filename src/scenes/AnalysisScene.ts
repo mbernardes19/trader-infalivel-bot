@@ -54,7 +54,6 @@ analysisScene.enter(async (ctx) => {
                 await ctx.reply(`Você já ativou sua assinatura Monettize comigo antes.`)
                 return await endConversation(ctx);
             } else {
-                logError('Erro ao adicionar usuário ao banco de dados', err)
                 await ctx.reply(`Sua compra na Monetizze foi confirmada, porém ocorreu um erro ao ativar sua assinatura na Monetizze.`)
                 return await endConversation(ctx);
             }
@@ -126,10 +125,11 @@ const getUserData = async (ctx): Promise<UserData> => {
     return userData;
 }
 
-const saveUser = async (newUser) => {
+const saveUser = async (newUser: User) => {
     try {
         await addUserToDatabase(newUser, connection)
     } catch (err) {
+        logError(`ERRO AO SALVAR USUÁRIO NO BANCO DE DADOS ${newUser.getUserData().telegramId}`, err)
         throw err;
     }
 }

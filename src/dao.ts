@@ -2,6 +2,7 @@ import util from 'util';
 import { Connection } from 'mysql';
 import User from './model/User';
 import { getUsersNewStatusAssinatura } from './services/monetizze';
+import { logError } from './logger';
 
 
 const addUserToDatabase = async (user: User, connection: Connection) => {
@@ -21,6 +22,7 @@ const getUserByTelegramId = async (telegramId: string|number, connection: Connec
         const result = await query(`select * from Users where id_telegram='${telegramId}'`);
         return result[0];
     } catch (err) {
+        logError(`ERRO AO PEGAR USUÁRIO DO BANCO DE DADOS POR ID ${telegramId}`, err);
         throw err
     }
 }
@@ -34,6 +36,7 @@ const getAllValidUsers = async (connection: Connection): Promise<User[]> => {
         console.log('users', users)
         return users;
     } catch (err) {
+        logError(`ERRO AO PEGAR TODOS OS USUÁRIOS VÁLIDOS DO BANCO DE DADOS`, err);
         throw err;
     }
 }
@@ -43,6 +46,7 @@ const getAllInvalidNonKickedUsers = async (connection: Connection) => {
     try {
         return await query(`select * from Users where not status_assinatura='ativa' and kickado='N'`);
     } catch (err) {
+        logError(`ERRO AO PEGAR TODOS OS USUÁRIOS INVÁLIDOS NÃO KICKADOS DO BANCO DE DADOS`, err);
         throw err;
     }
 }
@@ -52,6 +56,7 @@ const getAllInvalidUsers = async (connection: Connection) => {
     try {
         return await query(`select * from Users where not status_assinatura='ativa'`);
     } catch (err) {
+        logError(`ERRO AO PEGAR TODOS OS USUÁRIOS INVÁLIDOS DO BANCO DE DADOS`, err);
         throw err;
     }
 }
@@ -66,6 +71,7 @@ const updateUsersStatusAssinatura = async (users: User[], connection: Connection
     try {
         await Promise.all(updates);
     } catch (err) {
+        logError(`ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS ${users}`, err);
         throw err;
     }
 }
@@ -75,6 +81,7 @@ const markUserAsKicked = async (telegramId: string|number, connection: Connectio
     try {
         return await query(`update Users set kickado='S' where id_telegram='${telegramId}'`);
     } catch (err) {
+        logError(`ERRO AO MARCAR USUÁRIO COMO KICKADO ${telegramId}`, err);
         throw err;
     }
 }
@@ -86,6 +93,7 @@ const updateViewChats = async (telegramId: string|number, connection: Connection
         const newVerCanais = parseInt(dbResult.ver_canais, 10) + 1;
         await query(`update Users set ver_canais=${newVerCanais} where id_telegram='${telegramId}'`);
     } catch (err) {
+        logError(`ERRO AO ATUALIZAR VISUALIZAÇÕES DE CANAIS DE USUÁRIO ${telegramId}`, err);
         throw err;
     }
 }

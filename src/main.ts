@@ -2,7 +2,7 @@ import App, { Request, Response, Express } from "express";
 import { Telegraf, Stage, session, Extra, Markup } from 'telegraf';
 import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
-import { log } from './logger';
+import { log, logError } from './logger';
 import {getUserByTelegramId, updateViewChats} from './dao';
 import CacheService from "./services/cache";
 import path from 'path';
@@ -24,10 +24,10 @@ startCronJobs();
 
 bot.use(session())
 bot.use(MainStage.middleware())
-bot.on('new_chat_members', (ctx) => console.log(ctx.message.new_chat_members))
 bot.command('start', Stage.enter('welcome'))
 bot.command('reiniciar', Stage.enter('welcome'))
 bot.command('canais', async ctx => {
+    log(`Usuário ${ctx.chat.id} solicitou ver os canais disponíveis`);
     try {
         const dbUserResult = await getUserByTelegramId(ctx.chat.id, connection);
         if (!dbUserResult) {
@@ -51,7 +51,7 @@ bot.command('canais', async ctx => {
         await ctx.reply('É pra já!', Extra.markup(teclado))
         await updateViewChats(ctx.chat.id, connection);
     } catch (err) {
-        log(err)
+        logError(`ERRO AO ENVIAR CANAIS DISPONÍVEIS POR COMANDO PARA USUÁRIO ${ctx.chat.id}`, err)
         await ctx.reply('Ocorreu um erro ao verificar sua assinatura Monetizze. Tente novamente mais tarde.')
     }
 });
