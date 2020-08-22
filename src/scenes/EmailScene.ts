@@ -5,12 +5,16 @@ import { confirmado, negado, validate } from '../services/validate';
 
 const emailScene = new BaseScene('email');
 
+log(`Entrando em cena de EMAIL`)
+
 emailScene.command('reiniciar', ctx => {
+    log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return ctx.scene.enter('welcome')
 })
 
 emailScene.command('parar', async ctx => {
+    log(`Parando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return await ctx.scene.leave()
 })
@@ -43,7 +47,7 @@ const confirmEmail = async (ctx) => {
 }
 
 const saveEmail = async (email) => {
-    CacheService.saveEmail(email);//'matheus.viegas@gmail.com'
+    CacheService.saveEmail(email);
     log(`Email definido ${email}`);
 }
 
