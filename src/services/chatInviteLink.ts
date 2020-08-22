@@ -1,6 +1,6 @@
 import { Telegram } from 'telegraf';
 import CacheService from '../services/cache';
-import { log } from '../logger';
+import { log, logError } from '../logger';
 
 const { ID_CANAL_GERAL, ID_CANAL_SILVER, ID_CANAL_GOLD, ID_CANAL_DIAMOND, ID_GRUPO_BLACK_DIAMOND } = process.env
 
@@ -11,6 +11,7 @@ let linkCanalDiamond = ''
 let linkGrupoBlackDiamond = ''
 
 const exportChatsInviteLink = async () => {
+    log(`🔗💬 GERANDO NOVOS LINKS PARA OS CHAT!`)
     try {
         const telegramClient = CacheService.get<Telegram>('telegramClient')
         linkCanalGeral = await telegramClient.exportChatInviteLink(ID_CANAL_GERAL)
@@ -18,18 +19,21 @@ const exportChatsInviteLink = async () => {
         linkCanalGold = await telegramClient.exportChatInviteLink(ID_CANAL_GOLD)
         linkCanalDiamond = await telegramClient.exportChatInviteLink(ID_CANAL_DIAMOND)
         linkGrupoBlackDiamond = await telegramClient.exportChatInviteLink(ID_GRUPO_BLACK_DIAMOND)
+        log(`🔗💬 LINKS PARA CHATS GERADOS!`)
+        log(`🔗💬 GERAL: ${linkCanalGeral}, SILVER: ${linkCanalSilver}, GOLD: ${linkCanalGold}, DIAMOND: ${linkCanalDiamond}, BLACK DIAMOND: ${linkGrupoBlackDiamond}`)
     } catch (err) {
-        console.log('erro exporta chat', err)
+        logError(`ERRO AO GERAR NOVOS LINKS PARA CHATS`, err)
     }
 }
 
 const startChatLinkValidation = () => {
-    log('COMEÇOU VALIDAÇÃO DE LINKS');
+    log(`VALIDAÇÃO DE LINKS INICIADA!`);
     exportChatsInviteLink();
     setInterval(async () => await exportChatsInviteLink(), 300000)
 }
 
 const getChatInviteLink = (chatId: number|string) => {
+    log(`Pegando link para chat ${chatId}`)
     switch(chatId) {
         case ID_CANAL_GERAL:
             return linkCanalGeral;
@@ -46,4 +50,4 @@ const getChatInviteLink = (chatId: number|string) => {
     }
 }
 
-export { exportChatsInviteLink, getChatInviteLink, startChatLinkValidation }
+export { getChatInviteLink, startChatLinkValidation }
