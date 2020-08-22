@@ -1,9 +1,11 @@
 import { BaseScene, Markup, Extra } from 'telegraf';
 import CacheService from '../services/cache';
+import { log } from '../logger';
 
 const welcomeScene = new BaseScene('welcome')
 
 welcomeScene.command('reiniciar', async ctx => {
+    log(`Reiniciando bot por ${ctx.chat.id}`)
     if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
         return await ctx.scene.leave();
     }
@@ -12,6 +14,7 @@ welcomeScene.command('reiniciar', async ctx => {
 })
 
 welcomeScene.command('parar', async ctx => {
+    log(`Parando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return await ctx.scene.leave()
 })
@@ -20,7 +23,6 @@ welcomeScene.enter(async (ctx) => {
     if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
         return await ctx.scene.leave();
     }
-    console.log(CacheService.getFullName());
     await welcome(ctx);
     await showPaymentOptions(ctx);
     await ctx.scene.enter('payment')

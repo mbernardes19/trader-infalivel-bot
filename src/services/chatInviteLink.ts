@@ -10,8 +10,6 @@ let linkCanalGold = ''
 let linkCanalDiamond = ''
 let linkGrupoBlackDiamond = ''
 
-console.log('LINKS INICIAIS', linkCanalGeral, linkCanalSilver, linkCanalGold, linkCanalDiamond, linkGrupoBlackDiamond);
-
 const exportChatsInviteLink = async () => {
     try {
         const telegramClient = CacheService.get<Telegram>('telegramClient')
@@ -20,7 +18,6 @@ const exportChatsInviteLink = async () => {
         linkCanalGold = await telegramClient.exportChatInviteLink(ID_CANAL_GOLD)
         linkCanalDiamond = await telegramClient.exportChatInviteLink(ID_CANAL_DIAMOND)
         linkGrupoBlackDiamond = await telegramClient.exportChatInviteLink(ID_GRUPO_BLACK_DIAMOND)
-        console.log('NOVOS LINKS', linkCanalGeral, linkCanalSilver, linkCanalGold, linkCanalDiamond, linkGrupoBlackDiamond);
     } catch (err) {
         console.log('erro exporta chat', err)
     }

@@ -31,9 +31,7 @@ const getAllValidUsers = async (connection: Connection): Promise<User[]> => {
     const query = util.promisify(connection.query).bind(connection)
     try {
         const dbResults = await query(`select * from Users where status_assinatura = 'ativa'`);
-        console.log('dbResults', dbResults);
         const users: User[] = dbResults.map(dbResult => User.fromDatabaseResult(dbResult))
-        console.log('users', users)
         return users;
     } catch (err) {
         logError(`ERRO AO PEGAR TODOS OS USUÁRIOS VÁLIDOS DO BANCO DE DADOS`, err);

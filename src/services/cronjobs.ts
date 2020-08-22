@@ -48,7 +48,6 @@ const updateValidUsersStatusAssinaturaAtEveryTime = () => {
 
     Cron.schedule(eachHour, async () => {
         const allUsers = await getAllValidUsers(connection);
-        console.log('all users', allUsers)
         await updateUsersStatusAssinatura(allUsers, connection);
     });
 }

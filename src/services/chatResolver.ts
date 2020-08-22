@@ -3,7 +3,6 @@ import { isBefore } from 'date-fns'
 import { Planos } from '../model/Planos';
 
 export async function getChat(plano: string, dataAssinatura: string): Promise<[string, string]> {
-    console.log('DATA ASSINATURA', dataAssinatura);
     let chat;
     let chatName;
     if (process.env.NODE_ENV === 'production') {
@@ -52,18 +51,14 @@ export async function getChat(plano: string, dataAssinatura: string): Promise<[s
 
     if (process.env.NODE_ENV === 'production') {
         if (checkIfIsBefore(dataAssinatura, new Date(2020,7,6))) {
-            console.log(`${dataAssinatura} vai pro GOLD`)
             return ['Canal Gold', process.env.ID_CANAL_GOLD]
         } else {
-            console.log(`${dataAssinatura} vai pra DIVISAO`)
             return [chatName, chat]
         }
     } else {
         if (checkIfIsBefore(dataAssinatura, new Date(2020,7,6))) {
-            console.log(`${dataAssinatura} vai pro GOLD`)
             return ['Canal Gold', process.env.ID_CANAL_TEST_GOLD]
         } else {
-            console.log(`${dataAssinatura} vai pra DIVISAO`)
             return [chatName, chat]
         }
     }
@@ -74,6 +69,5 @@ const checkIfIsBefore = (data1: string, data2:Date) => {
     const mes = parseInt(data1.substring(5,7),10)
     const dia = parseInt(data1.substring(8,10),10)
     const result = isBefore(new Date(ano, mes-1, dia), data2)
-    console.log(result);
     return result;
 }

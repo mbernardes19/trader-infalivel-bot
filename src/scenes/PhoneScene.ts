@@ -17,7 +17,6 @@ phoneScene.command('parar', async ctx => {
 
 
 phoneScene.enter(async (ctx) => {
-    console.log('TELEFONE', CacheService.getPhone())
     if (!CacheService.getPhone()) {
         return await askForPhone(ctx);
     }
