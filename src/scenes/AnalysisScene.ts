@@ -91,22 +91,18 @@ analysisScene.enter(async (ctx) => {
 const getUserDiscountCoupon = async () => {
     const email = CacheService.getEmail();
     const plano = CacheService.getPlano();
-    log(`Pegando cupom de desconto de usuário ${email}`)
     try {
         return await getDiscountCouponIdFromUser(email, plano)
     } catch (err) {
-        logError(`ERRO AO PEGAR CUPOM DE DESCONTO DO USUÁRIO ${email}`, err)
         throw err;
     }
 }
 
 const getUserDataAssinatura = async () => {
     const email = CacheService.getEmail();
-    log(`Pegando data de assinatura de usuário ${email}`)
     try {
         return await getDataAssinaturaFromUser(email);
     } catch (err) {
-        logError(`ERRO AO PEGAR DATA DE ASSINATURA DO USUÁRIO ${email}`, err)
         throw err;
     }
 }
