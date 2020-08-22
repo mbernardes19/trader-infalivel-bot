@@ -14,14 +14,14 @@ const validate = (informacao, dado) => {
     }
 }
 
-const formaDePagamentoValida = (ctx) => CARTAO.test(ctx.message.text) || BOLETO.test(ctx.message.text);
-const cartao = (ctx) => CARTAO.test(ctx.message.text);
-const boleto = (ctx) => BOLETO.test(ctx.message.text);
-const silver = (ctx) => PLANO.SILVER.test(ctx.message.text);
-const gold = (ctx) => PLANO.GOLD.test(ctx.message.text);
-const diamond = (ctx) => PLANO.DIAMOND.test(ctx.message.text);
-const blackDiamond = (ctx) => PLANO.BLACK_DIAMOND.test(ctx.message.text);
-const confirmado = (ctx) => SIM.test(ctx.message.text);
-const negado = (ctx) => NAO.test(ctx.message.text);
+const formaDePagamentoValida = (ctx) => ctx.message ? CARTAO.test(ctx.message.text) || BOLETO.test(ctx.message.text) : CARTAO.test(ctx.update.message.text) || BOLETO.test(ctx.update.message.text);
+const cartao = (ctx) => ctx.message ? CARTAO.test(ctx.message.text) : CARTAO.test(ctx.update.message.text);
+const boleto = (ctx) => ctx.message ? BOLETO.test(ctx.message.text) : BOLETO.test(ctx.update.message.text);
+const silver = (ctx) => ctx.message ? PLANO.SILVER.test(ctx.message.text) : PLANO.SILVER.test(ctx.update.message.text);
+const gold = (ctx) => ctx.message ? PLANO.GOLD.test(ctx.message.text) : PLANO.GOLD.test(ctx.update.message.text);
+const diamond = (ctx) => ctx.message ? PLANO.DIAMOND.test(ctx.message.text) : PLANO.DIAMOND.test(ctx.update.message.text);
+const blackDiamond = (ctx) => ctx.message ? PLANO.BLACK_DIAMOND.test(ctx.message.text) : PLANO.BLACK_DIAMOND.test(ctx.update.message.text);
+const confirmado = (ctx) => ctx.message ? SIM.test(ctx.message.text) : SIM.test(ctx.update.message.text);
+const negado = (ctx) => ctx.message ? NAO.test(ctx.message.text) : NAO.test(ctx.update.message.text);
 
 export { formaDePagamentoValida, cartao, boleto, confirmado, negado, silver, gold, diamond, blackDiamond, validate }
