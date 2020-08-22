@@ -5,8 +5,6 @@ import { confirmado, negado, validate } from '../services/validate';
 
 const phoneScene = new BaseScene('phone');
 
-log(`Entrando em cena de TELEFONE`)
-
 phoneScene.command('reiniciar', ctx => {
     log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()

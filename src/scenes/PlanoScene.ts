@@ -6,8 +6,6 @@ import { Planos } from '../model/Planos';
 
 const planoScene = new BaseScene('plano')
 
-log(`Entrando em cena de PLANO`)
-
 planoScene.command('reiniciar', ctx => {
     log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()

@@ -5,8 +5,6 @@ import { confirmado, negado, validate } from '../services/validate';
 
 const emailScene = new BaseScene('email');
 
-log(`Entrando em cena de EMAIL`)
-
 emailScene.command('reiniciar', ctx => {
     log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()

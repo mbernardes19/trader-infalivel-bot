@@ -5,8 +5,6 @@ import { cartao, boleto } from '../services/validate';
 
 const paymentScene = new BaseScene('payment')
 
-log(`Entrando em cena de FORMA DE PAGAMENTO`)
-
 paymentScene.command('reiniciar', ctx => {
     log(`Reiniciando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
@@ -14,7 +12,7 @@ paymentScene.command('reiniciar', ctx => {
 })
 
 paymentScene.command('parar', async ctx => {
-    log(`Reiniciando bot por ${ctx.chat.id}`)
+    log(`Parando bot por ${ctx.chat.id}`)
     CacheService.clearAllUserData()
     return await ctx.scene.leave()
 })
