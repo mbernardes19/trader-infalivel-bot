@@ -8,6 +8,7 @@ import { addUserToDatabase } from '../dao';
 import { connection } from '../db';
 import { getChat } from '../services/chatResolver';
 import { getChatInviteLink } from '../services/chatInviteLink';
+import { pegarDiasSobrandoDeAssinatura } from '../services/diasAssinatura';
 
 const analysisScene = new BaseScene('analysis')
 
@@ -125,6 +126,7 @@ const getUserData = async (ctx): Promise<UserData> => {
         userData.phone = CacheService.getPhone();
         userData.email = CacheService.getEmail();
         userData.dataAssinatura = await getUserDataAssinatura();
+        userData.diasAteFimDaAssinatura = pegarDiasSobrandoDeAssinatura(CacheService.getPlano(), userData.dataAssinatura)
 
         log(`Username Telegram definido ${userData.username}`)
         log(`Id Telegram definido ${userData.telegramId}`)

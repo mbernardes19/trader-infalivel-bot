@@ -9,4 +9,5 @@ export default class UserData {
     email: string;
     dataAssinatura: string;
     statusAssinatura? :string
+    diasAteFimDaAssinatura?: number;
 }
