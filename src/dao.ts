@@ -30,7 +30,7 @@ const getUserByTelegramId = async (telegramId: string|number, connection: Connec
 const getAllValidUsers = async (connection: Connection): Promise<User[]> => {
     const query = util.promisify(connection.query).bind(connection)
     try {
-        const dbResults = await query(`select * from Users where status_assinatura = 'ativa'`);
+        const dbResults = await query(`select * from Users where status_assinatura = 'ativa' and kickado = 'N'`);
         const users: User[] = dbResults.map(dbResult => User.fromDatabaseResult(dbResult))
         return users;
     } catch (err) {
@@ -82,6 +82,23 @@ const updateUsersStatusAssinatura = async (users: User[], connection: Connection
     }
 }
 
+const updateUsersDiasAteFimAssinatura = async (users: User[], connection: Connection) => {
+    log(`Iniciando atualização de dias até fim de assinatura ${users}`)
+    const query = util.promisify(connection.query).bind(connection);
+    const updates = [];
+    const diasAteFimDaAssinaturaAtualizadas = users.map(user => user.getUserData().diasAteFimDaAssinatura - 1)
+    users.forEach((user, index) => {
+        updates.push(query(`update Users set dias_ate_fim_assinatura='${diasAteFimDaAssinaturaAtualizadas[index]}' where id_telegram='${user.getUserData().telegramId}'`))
+    })
+    try {
+        await Promise.all(updates);
+        log(`Atualização de status dias até fim de assinatura realizada com sucesso!`)
+    } catch (err) {
+        logError(`ERRO AO ATUALIZAR DIAS ATÉ FIM DE ASSINATURA DE USUÁRIOS ${users}`, err);
+        throw err;
+    }
+}
+
 const markUserAsKicked = async (telegramId: string|number, connection: Connection) => {
     const query = util.promisify(connection.query).bind(connection)
     try {
@@ -105,4 +122,4 @@ const updateViewChats = async (telegramId: string|number, connection: Connection
     }
 }
 
-export { addUserToDatabase, getUserByTelegramId, getAllValidUsers, getAllInvalidUsers, updateUsersStatusAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }
+export { addUserToDatabase, getUserByTelegramId, getAllValidUsers, getAllInvalidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }
