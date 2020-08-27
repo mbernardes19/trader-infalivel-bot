@@ -21,4 +21,5 @@ app.get('/revive', async (req, res) => {
 })
 
 const PORT = process.env.PORT_TRADER_INFALIVEL_BOT_HEALTH_CHECKER || process.env.PORT_APP || 21571 || 3000
+console.log('PORTA', PORT)
 app.listen(PORT, () => console.log(`Health checker rodando na porta ${PORT}`));
