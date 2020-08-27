@@ -1,17 +1,20 @@
 import Cron from 'node-cron';
-import { getAllInvalidNonKickedUsers, markUserAsKicked, getAllValidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura } from '../dao';
+import { getAllInvalidNonKickedUsers, getAllUsers, markUserAsKicked, getAllValidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura } from '../dao';
 import { connection } from '../db';
 import CacheService from './cache';
 import { Telegram } from 'telegraf';
 import { getChat } from './chatResolver';
 import { log, logError, enviarMensagemDeErroAoAdmin } from '../logger';
 import User from '../model/User';
+import { createCsvFile } from './csv';
+import { sendReportToEmail } from './email';
 
 const startCronJobs = () => {
     try {
         removeInvalidUsers();
         updateValidUsersStatusAssinatura();
         updateValidUsersDiasAteFimAssinatura();
+        sendCsvReportToEmail();
     } catch (err) {
         logError(`ERRO AO EXECUTAR CRONJOB`, err)
     }
@@ -147,7 +150,26 @@ const sendMessageToUsersCloseToEndAssinatura = async (users: User[]) => {
     } catch (err) {
         throw err;
     }
-
 };
+
+const sendCsvReportToEmail = () => {
+    const eachDayAt9AM = '0 9 * * *';
+    const header = ['Id Telegram', 'User Telegram', 'Plano', 'Cupom Desconto', 'Nome Completo', 'Telefone', 'Email', 'Forma de Pagamento', 'Data Assinatura', 'Status Assinatura', 'Dias Ate Fim Assinatura', 'Kickado', 'Ver Canais']
+
+    Cron.schedule(eachDayAt9AM, async () => {
+        log(`⏱️ Iniciando cronjob para enviar relatório diário de usuários por email`)
+        try {
+            const allUsers = await getAllUsers(connection);
+            await createCsvFile(header, allUsers, 'usuarios.csv');
+            log(`⏱️ Relatório de usuários criado com sucesso!`)
+            await sendReportToEmail()
+            log(`⏱️ Relatório de usuários enviado por email com sucesso!`)
+        } catch (err) {
+            logError(`⏱️ ERRO AO ENVIAR RELATÓRIO DIÁRIO DE USUÁRIOS`, err);
+            enviarMensagemDeErroAoAdmin(`⏱️ ERRO AO ENVIAR RELATÓRIO DIÁRIO DE USUÁRIOS}`, err)
+            throw err;
+        }
+    });
+}
 
 export { startCronJobs }

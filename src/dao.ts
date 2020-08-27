@@ -39,6 +39,17 @@ const getAllValidUsers = async (connection: Connection): Promise<User[]> => {
     }
 }
 
+const getAllUsers = async (connection: Connection): Promise<any[]> => {
+    const query = util.promisify(connection.query).bind(connection)
+    try {
+        const dbResults = await query(`select * from Users`);
+        return dbResults;
+    } catch (err) {
+        logError(`ERRO AO PEGAR TODOS OS USUÁRIOS DO BANCO DE DADOS`, err);
+        throw err;
+    }
+}
+
 const getAllInvalidNonKickedUsers = async (connection: Connection) => {
     const query = util.promisify(connection.query).bind(connection)
     try {
@@ -122,4 +133,4 @@ const updateViewChats = async (telegramId: string|number, connection: Connection
     }
 }
 
-export { addUserToDatabase, getUserByTelegramId, getAllValidUsers, getAllInvalidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }
+export { addUserToDatabase, getUserByTelegramId, getAllValidUsers, getAllUsers, getAllInvalidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }
