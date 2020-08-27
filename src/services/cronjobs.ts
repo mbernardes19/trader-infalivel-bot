@@ -103,6 +103,7 @@ const updateValidUsersDiasAteFimAssinatura = async () => {
 }
 
 const sendMessageToUsersCloseToEndAssinatura = async (users: User[]) => {
+    const mensagemAviso = (dias) => `Olá! Acabei de verificar que daqui ${dias} dia(s) seu plano vai expirar.\n\nSe você quer continuar lucrando com a família Método Trader Infalível tendo acesso ao curso completo, lista de sinais diária, operações ao vivo e sinais em tempo real, acesse agora seu email para verificar ou acesse direto a Monetizze e gere seu boleto.\n\nQualquer dúvida chame um dos suportes abaixo ⤵️`
     const telegramClient = CacheService.get<Telegram>('telegramClient');
     const usersCloseToEndAssinatura = users.filter(user => user.getUserData().diasAteFimDaAssinatura <= 3)
     const getChats = []
@@ -110,18 +111,17 @@ const sendMessageToUsersCloseToEndAssinatura = async (users: User[]) => {
     const usersToKick: User[] = []
     usersCloseToEndAssinatura.forEach(user => {
         if (user.getUserData().diasAteFimDaAssinatura === 3) {
-            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, 'Faltam 3 dias'))
+            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(3), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
         }
         if (user.getUserData().diasAteFimDaAssinatura === 2) {
-            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, 'Faltam 2 dias'))
+            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(2), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
         }
         if (user.getUserData().diasAteFimDaAssinatura === 1) {
-            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, 'Falta 1 dia'))
+            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(1), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
         }
         if (user.getUserData().diasAteFimDaAssinatura === 0) {
             getChats.push(getChat(user.getUserData().plano, user.getUserData().dataAssinatura))
             usersToKick.push(user)
-            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, 'Você foi removido'))
         }
     })
 
