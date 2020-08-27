@@ -4,7 +4,7 @@ const exec = util.promisify(require('child_process').exec);
 
 async function runDeploy() {
     try {
-        const {stdout, stderr} = await exec('pwd && cd .. && pwd && cd trader-infalivel-bot && bash ../../restart.sh && pwd')
+        const {stdout, stderr} = await exec('pwd && cd trader-infalivel-bot && pwd && bash ../../restart.sh && pwd')
         console.log('stdout', stdout)
         console.log('stderr', stderr)
     } catch (err) {
