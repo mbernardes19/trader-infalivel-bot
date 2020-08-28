@@ -19,6 +19,18 @@ welcomeScene.command('parar', async ctx => {
     return await ctx.scene.leave()
 })
 
+welcomeScene.command('suporte', async ctx => {
+    log(`Enviando suporte para ${ctx.chat.id}`)
+    const teclado = Markup.inlineKeyboard([
+        [Markup.urlButton('👉 SUPORTE 1', 't.me/juliasantanana')],
+        [Markup.urlButton('👉 SUPORTE 2', 't.me/diego_sti')],
+        [Markup.urlButton('👉 SUPORTE 3', 't.me/julianocba')],
+    ]);
+    await ctx.reply('Para falar com o suporte, clique abaixo ⤵️', Extra.markup(teclado))
+    CacheService.clearAllUserData()
+    return await ctx.scene.leave()
+})
+
 welcomeScene.enter(async (ctx) => {
     if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
         return await ctx.scene.leave();
