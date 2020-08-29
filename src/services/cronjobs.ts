@@ -156,7 +156,7 @@ const sendCsvReportToEmail = () => {
     const eachDayAt9AM = '0 9 * * *';
     const header = ['Id Telegram', 'User Telegram', 'Plano', 'Cupom Desconto', 'Nome Completo', 'Telefone', 'Email', 'Forma de Pagamento', 'Data Assinatura', 'Status Assinatura', 'Dias Ate Fim Assinatura', 'Kickado', 'Ver Canais']
 
-    Cron.schedule('* * * * *', async () => {
+    Cron.schedule(eachDayAt9AM, async () => {
         log(`⏱️ Iniciando cronjob para enviar relatório diário de usuários por email`)
         try {
             const allUsers = await getAllUsers(connection);
