@@ -73,7 +73,7 @@ export async function getChat(plano: string, dataAssinatura: string): Promise<[s
     }
 }
 
-export const checkIfIsBefore = (data1: string, data2:Date) => {
+const checkIfIsBefore = (data1: string, data2:Date) => {
     try {
         const ano = parseInt(data1.substring(0,4), 10)
         const mes = parseInt(data1.substring(5,7),10)

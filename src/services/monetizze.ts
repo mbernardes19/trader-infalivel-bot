@@ -22,8 +22,7 @@ const getDataAssinaturaFromUser = async (userEmail: string) => {
     try {
         const transaction = await getMonetizzeProductTransaction({ email: userEmail })
         log(`Pegando data de assinatura do usuário na Monetizze`);
-        const transactionsLength = transaction.dados.length;
-        return transaction.dados[transactionsLength-1].venda.dataInicio;
+        return transaction.dados[0].venda.dataInicio;
     } catch (err) {
         logError(`ERRO AO PEGAR DATA DE ASSINATURA DO USUÁRIO ${userEmail}`, err)
         throw err;
