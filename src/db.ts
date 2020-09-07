@@ -18,7 +18,8 @@ if (process.env.NODE_ENV === 'production') {
         host: process.env.DB_TEST_HOST,
         database: process.env.DB_TEST_DATABASE,
         user: process.env.DB_TEST_USER,
-        password: process.env.DB_TEST_PASSWORD
+        password: process.env.DB_TEST_PASSWORD,
+        dateStrings: true
     })
 }
 

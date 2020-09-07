@@ -39,6 +39,18 @@ const getAllValidUsers = async (connection: Connection): Promise<User[]> => {
     }
 }
 
+const getAllValidUsersWithPaymentBoleto = async (connection: Connection): Promise<User[]> => {
+    const query = util.promisify(connection.query).bind(connection)
+    try {
+        const dbResults = await query(`select * from Users where status_assinatura = 'ativa' and kickado = 'N' and forma_de_pagamento='boleto'`);
+        const users: User[] = dbResults.map(dbResult => User.fromDatabaseResult(dbResult))
+        return users;
+    } catch (err) {
+        logError(`ERRO AO PEGAR TODOS OS USUÁRIOS VÁLIDOS DO BANCO DE DADOS`, err);
+        throw err;
+    }
+}
+
 const getAllUsers = async (connection: Connection): Promise<any[]> => {
     const query = util.promisify(connection.query).bind(connection)
     try {
@@ -53,7 +65,7 @@ const getAllUsers = async (connection: Connection): Promise<any[]> => {
 const getAllInvalidNonKickedUsers = async (connection: Connection) => {
     const query = util.promisify(connection.query).bind(connection)
     try {
-        return await query(`select * from Users where not status_assinatura='ativa' and kickado='N'`);
+        return await query(`select * from Users where not status_assinatura='ativa' and kickado='N' and dias_ate_fim_assinatura <= 0`);
     } catch (err) {
         logError(`ERRO AO PEGAR TODOS OS USUÁRIOS INVÁLIDOS NÃO KICKADOS DO BANCO DE DADOS`, err);
         throw err;
@@ -133,4 +145,4 @@ const updateViewChats = async (telegramId: string|number, connection: Connection
     }
 }
 
-export { addUserToDatabase, getUserByTelegramId, getAllValidUsers, getAllUsers, getAllInvalidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }
+export { addUserToDatabase, getAllValidUsersWithPaymentBoleto, getUserByTelegramId, getAllValidUsers, getAllUsers, getAllInvalidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }

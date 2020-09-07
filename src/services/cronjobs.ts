@@ -1,5 +1,5 @@
 import Cron from 'node-cron';
-import { getAllInvalidNonKickedUsers, getAllUsers, markUserAsKicked, getAllValidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura } from '../dao';
+import { getAllInvalidNonKickedUsers, getAllUsers, markUserAsKicked, getAllValidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, getAllValidUsersWithPaymentBoleto } from '../dao';
 import { connection } from '../db';
 import CacheService from './cache';
 import { Telegram } from 'telegraf';
@@ -87,6 +87,7 @@ const updateValidUsersStatusAssinatura = () => {
 
 const updateValidUsersDiasAteFimAssinatura = async () => {
     const eachDayAt8AM = '0 8 * * *';
+    const test = '* * * * *';
 
     Cron.schedule(eachDayAt8AM, async () => {
         log(`⏱️ Iniciando cronjob para atualizar dias até fim de assinatura de usuários válidos`)
@@ -95,7 +96,7 @@ const updateValidUsersDiasAteFimAssinatura = async () => {
         try {
             allUsers = await getAllValidUsers(connection);
             await updateUsersDiasAteFimAssinatura(allUsers, connection);
-            const allUsersUpdated = await getAllValidUsers(connection);
+            const allUsersUpdated = await getAllValidUsersWithPaymentBoleto(connection);
             await sendMessageToUsersCloseToEndAssinatura(allUsersUpdated)
         } catch (err) {
             logError(`ERRO AO ATUALIZAR DIAS ATÉ FIM DE ASSINATURA DE USUÁRIOS ${allUsers}`, err);
