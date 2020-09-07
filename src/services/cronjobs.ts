@@ -107,12 +107,10 @@ const updateValidUsersDiasAteFimAssinatura = async () => {
 }
 
 const sendMessageToUsersCloseToEndAssinatura = async (users: User[]) => {
-    const mensagemAviso = (dias) => `Olá! Acabei de verificar que daqui ${dias} dia(s) seu plano vai expirar.\n\nSe você quer continuar lucrando com a família Método Trader Infalível tendo acesso ao curso completo, lista de sinais diária, operações ao vivo e sinais em tempo real, acesse agora seu email para verificar ou acesse direto a Monetizze e gere seu boleto.\n\nQualquer dúvida chame um dos suportes abaixo ⤵️`
+    const mensagemAviso = (dias) => `Olá! Acabei de verificar que daqui a ${dias} dia(s) seu plano vai expirar.\n\nSe você quer continuar lucrando com a família Método Trader Infalível tendo acesso ao curso completo, lista de sinais diária, operações ao vivo e sinais em tempo real, acesse agora seu email para verificar ou acesse direto a Monetizze e gere seu boleto.\n\nQualquer dúvida chame um dos suportes abaixo ⤵️`
     const telegramClient = CacheService.get<Telegram>('telegramClient');
     const usersCloseToEndAssinatura = users.filter(user => user.getUserData().diasAteFimDaAssinatura <= 3)
-    const getChats = []
     const actions = []
-    const usersToKick: User[] = []
     usersCloseToEndAssinatura.forEach(user => {
         if (user.getUserData().diasAteFimDaAssinatura === 3) {
             actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(3), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
@@ -123,34 +121,7 @@ const sendMessageToUsersCloseToEndAssinatura = async (users: User[]) => {
         if (user.getUserData().diasAteFimDaAssinatura === 1) {
             actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(1), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
         }
-        if (user.getUserData().diasAteFimDaAssinatura === 0) {
-            getChats.push(getChat(user.getUserData().plano, user.getUserData().dataAssinatura))
-            usersToKick.push(user)
-        }
     })
-
-    let chatsIds;
-    try {
-        await Promise.all(actions);
-        const chats = await Promise.all(getChats);
-        chatsIds = chats.map(chat => chat[1]);
-    } catch (err) {
-        throw err;
-    }
-
-    const kick = []
-
-    usersToKick.forEach((user, index) => {
-        kick.push(telegramClient.kickChatMember(process.env.ID_CANAL_GERAL, parseInt(user.getUserData().telegramId, 10)))
-        kick.push(telegramClient.kickChatMember(chatsIds[index], parseInt(user.getUserData().telegramId, 10)))
-        kick.push(markUserAsKicked(user.getUserData().telegramId, connection))
-    })
-
-    try {
-        await Promise.all(kick)
-    } catch (err) {
-        throw err;
-    }
 };
 
 const sendCsvReportToEmail = () => {

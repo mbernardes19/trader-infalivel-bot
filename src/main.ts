@@ -13,8 +13,6 @@ import { getChat } from './services/chatResolver';
 import { getChatInviteLink } from './services/chatInviteLink';
 import User from "./model/User";
 import { startCronJobs } from './services/cronjobs';
-import { getMonetizzeProductTransaction } from './services/request'
-import { pegarDiasSobrandoDeAssinatura } from './services/diasAssinatura'
 
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
 const bot = new Telegraf(botToken);
@@ -59,13 +57,6 @@ bot.command('canais', async ctx => {
 });
 
 bot.command('suporte', async (ctx) => {
-    // const email = 'jhonathan22med@gmail.com'
-    // const resp = await getMonetizzeProductTransaction({email})
-    // console.log('DIAS PARA TERMINAR', await pegarDiasSobrandoDeAssinatura('78914', email))
-    // resp.dados.map(async dado => {
-    //             console.log(dado.assinatura, dado.venda)
-    //             // console.log(dado.venda.dataInicio, dado.venda.dataFinalizada, dado.venda.status, dado.venda.boleto_vencimento, dado.assinatura.parcela, dado.venda.valor, dado.plano.periodicidade, dado.venda.linkBoleto+"\n")
-    //     })
     const teclado = Markup.inlineKeyboard([
         [Markup.urlButton('👉 SUPORTE 1', 't.me/juliasantanana')],
         [Markup.urlButton('👉 SUPORTE 2', 't.me/diego_sti')],

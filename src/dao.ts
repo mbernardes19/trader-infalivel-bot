@@ -3,6 +3,7 @@ import { Connection } from 'mysql';
 import User from './model/User';
 import { getUsersNewStatusAssinatura } from './services/monetizze';
 import { log, logError } from './logger';
+import { pegarDiasSobrandoDeAssinatura } from './services/diasAssinatura';
 
 
 const addUserToDatabase = async (user: User, connection: Connection) => {
@@ -107,17 +108,30 @@ const updateUsersStatusAssinatura = async (users: User[], connection: Connection
 
 const updateUsersDiasAteFimAssinatura = async (users: User[], connection: Connection) => {
     log(`Iniciando atualização de dias até fim de assinatura ${users}`)
-    const query = util.promisify(connection.query).bind(connection);
-    const updates = [];
-    const diasAteFimDaAssinaturaAtualizadas = users.map(user => user.getUserData().diasAteFimDaAssinatura - 1)
-    users.forEach((user, index) => {
-        updates.push(query(`update Users set dias_ate_fim_assinatura='${diasAteFimDaAssinaturaAtualizadas[index]}' where id_telegram='${user.getUserData().telegramId}'`))
+
+    const query = util.promisify(connection.query).bind(connection)
+    const allValidUsers = await getAllValidUsers(connection)
+    const leftDaysPromise = []
+    allValidUsers.map(user => {
+        leftDaysPromise.push(pegarDiasSobrandoDeAssinatura(user.getUserData().plano, user.getUserData().email))
     })
+
+    let leftDays
     try {
-        await Promise.all(updates);
-        log(`Atualização de status dias até fim de assinatura realizada com sucesso!`)
+        leftDays = await Promise.all(leftDaysPromise)
     } catch (err) {
-        logError(`ERRO AO ATUALIZAR DIAS ATÉ FIM DE ASSINATURA DE USUÁRIOS ${users}`, err);
+        logError(`ERRO NA HORA DE PEGAR DIAS QUE FALTAM PARA TERMINAR ASSINATURA DE USUÁRIOS ${allValidUsers}`, err)
+    }
+
+    const updates = []
+    allValidUsers.map((user, index) => {
+        updates.push(query(`update Users set dias_ate_fim_assinatura=${leftDays[index]} where id_telegram='${user.getUserData().telegramId}'`))
+    })
+
+    try {
+        await Promise.all(updates)
+    } catch (err) {
+        logError(`ERRO AO ATUALIZAR DIAS ATÉ FIM DE ASSINATURA DE USUÁRIOS ${allValidUsers}`, err);
         throw err;
     }
 }
