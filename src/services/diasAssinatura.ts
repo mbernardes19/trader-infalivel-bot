@@ -6,10 +6,14 @@ const pegarDiasSobrandoDeAssinatura = async (plano: string, email: string) => {
     const response = await getMonetizzeProductTransaction({email})
     let vencimentoBoleto;
     let ultimoPagamento;
-    if (response.dados[0].venda.formaPagamento === 'Boleto') {
+    if (response.dados[0].venda.formaPagamento === 'Boleto' && !response.dados[0].venda.dataFinalizada) {
         vencimentoBoleto = response.dados[0].venda.boleto_vencimento
-    } else {
+    }
+    if (response.dados[0].venda.formaPagamento === 'Boleto' && response.dados[0].venda.dataFinalizada) {
         ultimoPagamento = response.dados[0].venda.dataInicio
+    }
+    if (response.dados[0].venda.formaPagamento === 'Cartão de crédito' && response.dados[0].venda.dataFinalizada) {
+        ultimoPagamento = response.dados[0].venda.dataFinalizada
     }
     let diasDeAssinatura
     switch (plano) {
@@ -27,10 +31,25 @@ const pegarDiasSobrandoDeAssinatura = async (plano: string, email: string) => {
             break;
     }
     if (response.dados[0].venda.formaPagamento === 'Boleto') {
-        const dataVencimentoBoleto = toDate(vencimentoBoleto)
-        const hoje = new Date();
-        const diasParaTerminar = differenceInDays(dataVencimentoBoleto, hoje) + 1
-        return diasParaTerminar
+        if (response.dados[0].plano.codigo === Planos.SILVER && parseInt(response.dados[0].venda.valor, 10) > 100) {
+            const dataUltimoPagamento = toDate(response.dados[0].venda.dataInicio)
+            const hoje = new Date();
+            const diasDeUso = differenceInDays(hoje, dataUltimoPagamento)
+            diasDeAssinatura = 35;
+            const diasParaTerminar = diasDeAssinatura - diasDeUso + 1
+            return diasParaTerminar
+        } else if (response.dados[0].plano.codigo === Planos.SILVER && parseInt(response.dados[0].venda.valor, 10) === 100) {
+            const dataVencimentoBoleto = toDate(response.dados[0].venda.boleto_vencimento)
+            const hoje = new Date();
+            const diasParaTerminar = differenceInDays(dataVencimentoBoleto, hoje) + 1
+            return diasParaTerminar
+        } else if (response.dados[0].plano.codigo !== Planos.SILVER) {
+            const dataUltimoPagamento = toDate(response.dados[0].venda.dataInicio)
+            const hoje = new Date();
+            const diasDeUso = differenceInDays(hoje, dataUltimoPagamento)
+            const diasParaTerminar2 = diasDeAssinatura - diasDeUso + 1
+            return diasParaTerminar2
+        }
     } else {
         const dataUltimoPagamento = toDate(ultimoPagamento)
         const hoje = new Date();
