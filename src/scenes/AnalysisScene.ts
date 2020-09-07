@@ -138,7 +138,7 @@ const getUserData = async (ctx): Promise<UserData> => {
         userData.phone = CacheService.getPhone();
         userData.email = CacheService.getEmail();
         userData.dataAssinatura = await getUserDataAssinatura();
-        userData.diasAteFimDaAssinatura = pegarDiasSobrandoDeAssinatura(CacheService.getPlano(), userData.dataAssinatura)
+        userData.diasAteFimDaAssinatura = await pegarDiasSobrandoDeAssinatura(CacheService.getPlano(), CacheService.getEmail())
 
         log(`Username Telegram definido ${userData.username}`)
         log(`Id Telegram definido ${userData.telegramId}`)

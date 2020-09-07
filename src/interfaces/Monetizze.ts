@@ -72,6 +72,7 @@ export interface Venda {
     utm_campaign: string;
     linkBoleto: string;
     linha_digitavel: string;
+    boleto_vencimento?: string;
 }
 
 export interface Comissoes {
