@@ -110,9 +110,8 @@ const updateUsersDiasAteFimAssinatura = async (users: User[], connection: Connec
     log(`Iniciando atualização de dias até fim de assinatura ${users}`)
 
     const query = util.promisify(connection.query).bind(connection)
-    const allValidUsers = await getAllValidUsers(connection)
     const leftDaysPromise = []
-    allValidUsers.map(user => {
+    users.map(user => {
         leftDaysPromise.push(pegarDiasSobrandoDeAssinatura(user.getUserData().plano, user.getUserData().email))
     })
 
@@ -120,19 +119,19 @@ const updateUsersDiasAteFimAssinatura = async (users: User[], connection: Connec
     try {
         leftDays = await Promise.all(leftDaysPromise)
     } catch (err) {
-        logError(`ERRO NA HORA DE PEGAR DIAS QUE FALTAM PARA TERMINAR ASSINATURA DE USUÁRIOS ${allValidUsers}`, err)
+        logError(`ERRO NA HORA DE PEGAR DIAS QUE FALTAM PARA TERMINAR ASSINATURA DE USUÁRIOS ${users}`, err)
         throw err;
     }
 
     const updates = []
-    allValidUsers.map((user, index) => {
+    users.map((user, index) => {
         updates.push(query(`update Users set dias_ate_fim_assinatura=${leftDays[index]} where id_telegram='${user.getUserData().telegramId}'`))
     })
 
     try {
         await Promise.all(updates)
     } catch (err) {
-        logError(`ERRO AO ATUALIZAR DIAS ATÉ FIM DE ASSINATURA DE USUÁRIOS ${allValidUsers}`, err);
+        logError(`ERRO AO ATUALIZAR DIAS ATÉ FIM DE ASSINATURA DE USUÁRIOS ${users}`, err);
         throw err;
     }
 }
