@@ -1,6 +1,7 @@
 import Axios from 'axios';
 import { MonetizzeTrasactionOptions, MonetizzeTransactionResponse } from '../interfaces/Monetizze';
 import { log, logError } from '../logger';
+import CacheService from './cache';
 
 const createRequest = () => Axios.create({
     baseURL: 'https://api.monetizze.com.br/2.1/',
@@ -16,8 +17,12 @@ const createAuthorizedRequest = (token: string) => {
 
 const auth = async (): Promise<string> => {
     try {
-        const response = await createRequest().get('/token')
-        return response.data.token
+        if (!CacheService.get<string>('token')) {
+            const response = await createRequest().get('/token')
+            CacheService.saveToken(response.data.token);
+            return response.data.token
+        }
+        return CacheService.get<string>('token');
     } catch (err) {
         throw err
     }
