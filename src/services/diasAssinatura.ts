@@ -11,11 +11,7 @@ const pegarDiasSobrandoDeAssinatura = async (plano: string, email: string) => {
         logError(`ERRO AO PEGAR DIAS SOBRANDO DE ASSINATURA DO USUÁRIO ${email}`,err)
         throw err;
     }
-    let vencimentoBoleto;
     let ultimoPagamento;
-    if (response.dados[0].venda.formaPagamento === 'Boleto' && !response.dados[0].venda.dataFinalizada) {
-        vencimentoBoleto = response.dados[0].venda.boleto_vencimento
-    }
     if (response.dados[0].venda.formaPagamento === 'Boleto' && response.dados[0].venda.dataFinalizada) {
         ultimoPagamento = response.dados[0].venda.dataInicio
     }
@@ -46,10 +42,11 @@ const pegarDiasSobrandoDeAssinatura = async (plano: string, email: string) => {
             const diasParaTerminar = diasDeAssinatura - diasDeUso + 1
             return diasParaTerminar
         } else if (response.dados[0].plano.codigo === Planos.SILVER && parseInt(response.dados[0].venda.valor, 10) === 100) {
-            const dataVencimentoBoleto = toDate(response.dados[0].venda.boleto_vencimento)
+            const dataUltimoPagamento = toDate(response.dados[0].venda.dataInicio)
             const hoje = new Date();
-            const diasParaTerminar = differenceInDays(dataVencimentoBoleto, hoje) + 1
-            return diasParaTerminar
+            const diasDeUso = differenceInDays(hoje, dataUltimoPagamento)
+            const diasParaTerminar2 = diasDeAssinatura - diasDeUso + 1
+            return diasParaTerminar2
         } else if (response.dados[0].plano.codigo !== Planos.SILVER) {
             const dataUltimoPagamento = toDate(response.dados[0].venda.dataInicio)
             const hoje = new Date();
