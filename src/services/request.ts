@@ -18,12 +18,15 @@ const createAuthorizedRequest = (token: string) => {
 const auth = async (): Promise<string> => {
     try {
         if (!CacheService.get<string>('token')) {
+            log('Gerou novo token de auth')
             const response = await createRequest().get('/token')
             CacheService.saveToken(response.data.token);
             return response.data.token
         }
+        log('Pegou token de auth já armazenado')
         return CacheService.get<string>('token');
     } catch (err) {
+        logError('ERRO AO PEGAR TOKEN DA MONETIZZE', err)
         throw err
     }
 }
