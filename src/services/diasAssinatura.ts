@@ -1,9 +1,16 @@
 import { differenceInDays } from 'date-fns'
 import { Planos } from '../model/Planos'
 import { getMonetizzeProductTransaction } from './request';
+import { logError } from '../logger';
 
 const pegarDiasSobrandoDeAssinatura = async (plano: string, email: string) => {
-    const response = await getMonetizzeProductTransaction({email})
+    let response
+    try {
+        response = await getMonetizzeProductTransaction({email})
+    } catch (err) {
+        logError(`ERRO AO PEGAR DIAS SOBRANDO DE ASSINATURA DO USUÁRIO ${email}`,err)
+        throw err;
+    }
     let vencimentoBoleto;
     let ultimoPagamento;
     if (response.dados[0].venda.formaPagamento === 'Boleto' && !response.dados[0].venda.dataFinalizada) {

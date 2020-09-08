@@ -121,6 +121,7 @@ const updateUsersDiasAteFimAssinatura = async (users: User[], connection: Connec
         leftDays = await Promise.all(leftDaysPromise)
     } catch (err) {
         logError(`ERRO NA HORA DE PEGAR DIAS QUE FALTAM PARA TERMINAR ASSINATURA DE USUÁRIOS ${allValidUsers}`, err)
+        throw err;
     }
 
     const updates = []
