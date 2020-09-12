@@ -96,7 +96,7 @@ export default class CacheService {
     }
 
     static saveToken(value: string) {
-        this.cache.set('token', value, 900);
+        this.cache.set('token', value, 720);
     }
 
     static get<T>(key: string) {

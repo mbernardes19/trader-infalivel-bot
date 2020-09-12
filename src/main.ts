@@ -3,7 +3,7 @@ import { Telegraf, Stage, session, Extra, Markup } from 'telegraf';
 import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
 import { log, logError } from './logger';
-import {getUserByTelegramId, updateViewChats} from './dao';
+import {getUserByTelegramId, updateViewChats, getAllValidUsers, updateUsersStatusAssinatura} from './dao';
 import CacheService from "./services/cache";
 import path from 'path';
 dotEnv.config({path: path.join(__dirname, '..', '.env')});
@@ -55,6 +55,31 @@ bot.command('canais', async ctx => {
         await ctx.reply('Ocorreu um erro ao verificar sua assinatura Monetizze. Tente novamente mais tarde.')
     }
 });
+
+bot.command('t35t3', async ctx => {
+    let allUsers;
+    try {
+        allUsers = await getAllValidUsers(connection);
+        console.log(allUsers.length)
+        let start = 0
+        let theresold = 10
+        const intervalId = setInterval(async () => {
+            await updateUsersStatusAssinatura(allUsers.slice(start, theresold), connection);
+            console.log('USERS LENGTH', allUsers.length)
+            console.log('START', start, 'THERESOLD', theresold)
+            if (theresold >= allUsers.length) {
+                clearInterval(intervalId)
+            } else {
+                start = theresold;
+                theresold += 10;
+            }
+        }, 10000)
+
+        log('Todos usuários atualizados com sucesso')
+    } catch (err) {
+        logError('Deu ruim', err)
+    }
+})
 
 bot.command('suporte', async (ctx) => {
     const teclado = Markup.inlineKeyboard([
