@@ -80,13 +80,13 @@ const updateValidUsersStatusAssinatura = () => {
             const intervalId = setInterval(async () => {
                 await updateUsersStatusAssinatura(allUsers.slice(start, theresold), connection);
                 if (theresold >= allUsers.length) {
+                    log('Data até fim de assinatura de todos os usuários atualizadas com sucesso')
                     clearInterval(intervalId)
                 } else {
                     start = theresold;
                     theresold += 10;
                 }
             }, 10000)
-            log('Todos usuários atualizados com sucesso')
         } catch (err) {
             logError(`⏱️ ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS VÁLIDOS ${allUsers}`, err)
             enviarMensagemDeErroAoAdmin(`⏱️ ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS VÁLIDOS ${allUsers}`, err)
@@ -97,7 +97,6 @@ const updateValidUsersStatusAssinatura = () => {
 
 const updateValidUsersDiasAteFimAssinatura = async () => {
     const eachDayAt8AM = '0 8 * * *';
-    const test = '* * * * *';
 
     Cron.schedule(eachDayAt8AM, async () => {
         log(`⏱️ Iniciando cronjob para atualizar dias até fim de assinatura de usuários válidos`)
@@ -105,7 +104,18 @@ const updateValidUsersDiasAteFimAssinatura = async () => {
         let allUsers = [];
         try {
             allUsers = await getAllValidUsers(connection);
-            await updateUsersDiasAteFimAssinatura(allUsers, connection);
+            let start = 0
+            let theresold = 10
+            const intervalId = setInterval(async () => {
+                await updateUsersDiasAteFimAssinatura(allUsers.slice(start, theresold), connection);
+                if (theresold >= allUsers.length) {
+                    log('Todos usuários atualizados com sucesso')
+                    clearInterval(intervalId)
+                } else {
+                    start = theresold;
+                    theresold += 10;
+                }
+            }, 10000)
             const allUsersUpdated = await getAllValidUsersWithPaymentBoleto(connection);
             await sendMessageToUsersCloseToEndAssinatura(allUsersUpdated)
         } catch (err) {
