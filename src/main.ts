@@ -94,7 +94,11 @@ bot.on('message', async ctx => {
     if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
         return;
     }
-    await ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/parar - Parar nossa conversa\n/reiniciar - Começar nossa conversa do zero\n/suporte - Entrar em contato com nosso suporte')
+    try {
+        await ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/parar - Parar nossa conversa\n/reiniciar - Começar nossa conversa do zero\n/suporte - Entrar em contato com nosso suporte')
+    } catch (err) {
+        log(`ERRO AO ENVIAR MENSAGEM DE BOAS VINDAS ${err}`)
+    }
 })
 bot.launch()
 
