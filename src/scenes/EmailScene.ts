@@ -58,7 +58,7 @@ const confirmEmail = async (ctx) => {
 }
 
 const saveEmail = async (email) => {
-    CacheService.saveEmail(email);
+    CacheService.saveEmail(email.toLowerCase());
     log(`Email definido ${email}`);
 }
 
