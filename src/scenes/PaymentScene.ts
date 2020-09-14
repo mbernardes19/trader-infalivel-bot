@@ -76,12 +76,20 @@ const showPlanoOptions = async (ctx) => {
         [Markup.callbackButton('💎 Diamond', '90966')],
         [Markup.callbackButton('💎⬛ Black Diamond', '91261')]
     ])
-    await ctx.reply("Qual foi o plano que você contratou?", Extra.markup(planos))
+    try {
+        await ctx.reply("Qual foi o plano que você contratou?", Extra.markup(planos))
+    } catch (err) {
+        log(`ERRO AO ENVIAR MENSAGEM DE PEDIDO DE PLANO ${err}`)
+    }
 }
 
 const askForPlano = async (ctx) => {
-    await ctx.reply('Certo!');
+    try {
+        await ctx.reply('Certo!');
     await ctx.reply('Vou precisar de mais alguns dados pra confirmar o pagamento no servidor da Monetizze, tudo bem?');
+    } catch (err) {
+        log(`ERRO AO ENVIAR MENSAGEM ${err}`)
+    }
     await showPlanoOptions(ctx);
 }
 

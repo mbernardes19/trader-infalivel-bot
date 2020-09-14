@@ -56,7 +56,11 @@ const showPaymentOptions = async (ctx) => {
         [Markup.callbackButton('💳 Cartão de Crédito', 'cartao_de_credito')],
         [Markup.callbackButton('📄 Boleto', 'boleto')]
     ])
-    await ctx.reply("Qual foi sua forma de pagamento?", Extra.markup(pagamento))
+    try {
+        await ctx.reply("Qual foi sua forma de pagamento?", Extra.markup(pagamento))
+    } catch (err) {
+        log(`ERRO AO ENVIAR MENSAGEM DE PEDIDO DE PAGAMENTO ${err}`)
+    }
 }
 
 export default welcomeScene;
