@@ -80,7 +80,7 @@ const updateValidUsersStatusAssinatura = () => {
             const intervalId = setInterval(async () => {
                 await updateUsersStatusAssinatura(allUsers.slice(start, theresold), connection);
                 if (theresold >= allUsers.length) {
-                    log('Data até fim de assinatura de todos os usuários atualizadas com sucesso')
+                    log('Todos usuários atualizados com sucesso')
                     clearInterval(intervalId)
                 } else {
                     start = theresold;
@@ -96,7 +96,7 @@ const updateValidUsersStatusAssinatura = () => {
 }
 
 const updateValidUsersDiasAteFimAssinatura = async () => {
-    const eachDayAt8AM = '0 8 * * *';
+    const eachDayAt8AM = '30 8 * * *';
 
     Cron.schedule(eachDayAt8AM, async () => {
         log(`⏱️ Iniciando cronjob para atualizar dias até fim de assinatura de usuários válidos`)
@@ -109,7 +109,7 @@ const updateValidUsersDiasAteFimAssinatura = async () => {
             const intervalId = setInterval(async () => {
                 await updateUsersDiasAteFimAssinatura(allUsers.slice(start, theresold), connection);
                 if (theresold >= allUsers.length) {
-                    log('Todos usuários atualizados com sucesso')
+                    log('Data até fim de assinatura de todos os usuários atualizadas com sucesso')
                     clearInterval(intervalId)
                 } else {
                     start = theresold;
