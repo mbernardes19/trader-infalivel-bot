@@ -12,6 +12,19 @@ async function runDeploy() {
     }
 }
 
+app.get('/teste', (req, res) => {
+    console.log('GET NO /TESTE')
+    console.log('RESPONSE', res)
+    console.log('REQUEST BODY', req.body)
+    res.send('TRADER INFALÍVEL sub').status(200)
+})
+
+app.post('/teste', (req, res) => {
+    console.log('POST NO /TESTE')
+    console.log('RESPONSE', res)
+    console.log('REQUEST BODY', req.body)
+    res.send('TRADER INFALÍVEL sub').status(200)})
+
 app.get('/', (req, res) => {
     console.log('GET /')
     res.send('Hello TRADER INFALÍVEL').status(200)
