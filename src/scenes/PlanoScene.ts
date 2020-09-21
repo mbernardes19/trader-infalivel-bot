@@ -32,25 +32,21 @@ const showPlanoOptions = async (ctx) => {
 }
 
 planoScene.onAction(Planos.SILVER, async (ctx) => {
-    await ctx.answerCbQuery();
     await savePlano(Planos.SILVER);
     await ctx.scene.enter('name');
 })
 
 planoScene.onAction(Planos.GOLD, async (ctx) => {
-    await ctx.answerCbQuery();
     await savePlano(Planos.GOLD);
     await ctx.scene.enter('name');
 })
 
 planoScene.onAction(Planos.DIAMOND, async (ctx) => {
-    await ctx.answerCbQuery();
     await savePlano(Planos.DIAMOND);
     await ctx.scene.enter('name');
 })
 
 planoScene.onAction(Planos.BLACK_DIAMOND, async (ctx) => {
-    await ctx.answerCbQuery();
     await savePlano(Planos.BLACK_DIAMOND);
     await ctx.scene.enter('name');
 })
