@@ -1,36 +1,13 @@
-import { BaseScene, Extra, Markup, Context } from 'telegraf';
+import { Extra } from 'telegraf';
 import CacheService from '../services/cache';
 import { log } from '../logger';
 import { confirmado, negado, validate } from '../services/validate';
+import Scene from '../model/Scene';
+import Keyboard from '../model/Keyboard';
 
-const emailScene = new BaseScene('email');
+const emailScene = new Scene('email');
 
-emailScene.command('reiniciar', ctx => {
-    log(`Reiniciando bot por ${ctx.chat.id}`)
-    CacheService.clearAllUserData()
-    return ctx.scene.enter('welcome')
-})
-
-emailScene.command('parar', async ctx => {
-    log(`Parando bot por ${ctx.chat.id}`)
-    CacheService.clearAllUserData()
-    return await ctx.scene.leave()
-})
-
-emailScene.command('suporte', async ctx => {
-    log(`Enviando suporte para ${ctx.chat.id}`)
-    const teclado = Markup.inlineKeyboard([
-        [Markup.urlButton('👉 SUPORTE 1', 't.me/juliasantanana')],
-        [Markup.urlButton('👉 SUPORTE 2', 't.me/diego_sti')],
-        [Markup.urlButton('👉 SUPORTE 3', 't.me/julianocba')],
-    ]);
-    await ctx.reply('Para falar com o suporte, clique abaixo ⤵️', Extra.markup(teclado))
-    CacheService.clearAllUserData()
-    return await ctx.scene.leave()
-})
-
-
-emailScene.enter(async (ctx) => {
+emailScene.onEnter(async (ctx) => {
     if (!CacheService.getEmail()) {
         return await askForEmail(ctx);
     }
@@ -52,8 +29,7 @@ emailScene.use(async (ctx) => {
 });
 
 const confirmEmail = async (ctx) => {
-    const confirmacao = Markup.inlineKeyboard([Markup.callbackButton('👍 Sim', 'sim'), Markup.callbackButton('👎 Não', 'nao')])
-    await ctx.reply(`Confirmando... seu email é ${ctx.message.text}?`, Extra.inReplyTo(ctx.update.message.message_id).markup(confirmacao));
+    await ctx.reply(`Confirmando... seu email é ${ctx.message.text}?`, Extra.inReplyTo(ctx.update.message.message_id).markup(Keyboard.CONFIRMATION));
     return ctx.scene.enter('confirm_email');
 }
 
@@ -62,9 +38,9 @@ const saveEmail = async (email) => {
     log(`Email definido ${email}`);
 }
 
-const confirmEmailScene = new BaseScene('confirm_email');
+const confirmEmailScene = new Scene('confirm_email');
 
-confirmEmailScene.action('sim', async (ctx) => {
+confirmEmailScene.onAction('sim', async (ctx) => {
     const email = CacheService.getEmail();
     const validation = validate('email', email);
     if (validation.temErro) {
@@ -75,7 +51,7 @@ confirmEmailScene.action('sim', async (ctx) => {
     return ctx.scene.enter('analysis');
 });
 
-confirmEmailScene.action('nao', async (ctx) => {
+confirmEmailScene.onAction('nao', async (ctx) => {
     await ctx.reply('Por favor, digite seu telefone novamente:')
     return ctx.scene.enter('email');
 });

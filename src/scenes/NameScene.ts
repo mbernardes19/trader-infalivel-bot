@@ -1,35 +1,13 @@
-import { BaseScene, Extra, Markup } from 'telegraf';
+import { Extra } from 'telegraf';
 import CacheService from '../services/cache';
 import { log } from '../logger';
 import { confirmado, negado } from '../services/validate';
+import Scene from '../model/Scene';
+import Keyboard from '../model/Keyboard';
 
-const nameScene = new BaseScene('name');
+const nameScene = new Scene('name');
 
-nameScene.command('reiniciar', ctx => {
-    log(`Reiniciando bot por ${ctx.chat.id}`)
-    CacheService.clearAllUserData()
-    return ctx.scene.enter('welcome')
-})
-
-nameScene.command('parar', async ctx => {
-    log(`Parando bot por ${ctx.chat.id}`)
-    CacheService.clearAllUserData()
-    return await ctx.scene.leave()
-})
-
-nameScene.command('suporte', async ctx => {
-    log(`Enviando suporte para ${ctx.chat.id}`)
-    const teclado = Markup.inlineKeyboard([
-        [Markup.urlButton('👉 SUPORTE 1', 't.me/juliasantanana')],
-        [Markup.urlButton('👉 SUPORTE 2', 't.me/diego_sti')],
-        [Markup.urlButton('👉 SUPORTE 3', 't.me/julianocba')],
-    ]);
-    await ctx.reply('Para falar com o suporte, clique abaixo ⤵️', Extra.markup(teclado))
-    CacheService.clearAllUserData()
-    return await ctx.scene.leave()
-})
-
-nameScene.enter(async (ctx) => {
+nameScene.onEnter(async (ctx) => {
     if (!CacheService.getFullName()) {
         return await askForFullName(ctx);
     }
@@ -51,8 +29,7 @@ const askForFullNameAgain = async (ctx) => {
 }
 
 const confirmFullName = async (ctx) => {
-    const confirmacao = Markup.inlineKeyboard([Markup.callbackButton('👍 Sim', 'sim'), Markup.callbackButton('👎 Não', 'nao')])
-    await ctx.reply(`Confirmando... seu nome completo é ${ctx.message.text}?`, Extra.inReplyTo(ctx.update.message.message_id).markup(confirmacao));
+    await ctx.reply(`Confirmando... seu nome completo é ${ctx.message.text}?`, Extra.inReplyTo(ctx.update.message.message_id).markup(Keyboard.CONFIRMATION));
     return ctx.scene.enter('confirm_name');
 }
 
@@ -62,15 +39,15 @@ const saveFullName = async (fullname) => {
     log(`Nome completo definido ${fullname}`);
 }
 
-const confirmNameScene = new BaseScene('confirm_name');
+const confirmNameScene = new Scene('confirm_name');
 
-confirmNameScene.action('sim', async (ctx) => {
+confirmNameScene.onAction('sim', async (ctx) => {
     const nome = CacheService.getFullName();
     await ctx.reply(`Beleza, ${nome.includes(' ') ? nome.substring(0, nome.indexOf(' ')) : nome}!`);
     return ctx.scene.enter('phone');
 });
 
-confirmNameScene.action('nao', async (ctx) => {
+confirmNameScene.onAction('nao', async (ctx) => {
     return ctx.scene.enter('name');
 });
 
