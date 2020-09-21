@@ -1,10 +1,35 @@
+import { Extra } from 'telegraf';
 import CacheService from '../services/cache';
 import { log } from '../logger';
 import { silver, gold, diamond, blackDiamond } from '../services/validate';
 import { Planos } from '../model/Planos';
 import Scene from '../model/Scene';
+import Keyboard from '../model/Keyboard';
 
 const planoScene = new Scene('plano')
+
+planoScene.enter(async ctx => {
+    await askForPlano(ctx);
+})
+
+const askForPlano = async (ctx) => {
+    try {
+        await ctx.reply('Certo!');
+        await ctx.reply('Vou precisar de mais alguns dados pra confirmar o pagamento no servidor da Monetizze, tudo bem?');
+    } catch (err) {
+        log(`ERRO AO ENVIAR MENSAGEM ${err}`)
+    }
+    await showPlanoOptions(ctx);
+}
+
+const showPlanoOptions = async (ctx) => {
+    log(`Enviando opções de PLANO para ${ctx.chat.id}`)
+    try {
+        await ctx.reply("Qual foi o plano que você contratou?", Extra.markup(Keyboard.PLANOS_OPTIONS))
+    } catch (err) {
+        log(`ERRO AO ENVIAR MENSAGEM DE PEDIDO DE PLANO ${err}`)
+    }
+}
 
 planoScene.onAction(Planos.SILVER, async (ctx) => {
     await ctx.answerCbQuery();
