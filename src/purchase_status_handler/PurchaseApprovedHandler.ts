@@ -1,5 +1,5 @@
 import AbstractPurchaseStatusHandler from "./AbstractPurchaseStatusHandler"
-import { MonetizzePurchaseStatus } from "../model/MonetizzePurchaseStatus";
+import { PurchaseStatus } from "../model/PurchaseStatus";
 import { log, logError, enviarMensagemDeErroAoAdmin } from '../logger';
 import { addUserToDatabase } from '../dao';
 import { connection } from '../db';
@@ -109,8 +109,8 @@ const endConversation = async (ctx) => {
 
 export default class PurchaseApprovedHandler extends AbstractPurchaseStatusHandler {
 
-    async handle(purchaseStatus: MonetizzePurchaseStatus) {
-        if (purchaseStatus === MonetizzePurchaseStatus.PURCHASE_APPROVED) {
+    async handle(purchaseStatus: PurchaseStatus) {
+        if (purchaseStatus === PurchaseStatus.PURCHASE_APPROVED) {
             log(`Compra e plano de ${this._ctx.chat.id} foram confirmados!`);
             try {
                 const userData = await getUserData(this._ctx);

@@ -1,5 +1,5 @@
 import PurchaseStatusHandler from "./PurchaseStatusHandler";
-import { MonetizzePurchaseStatus } from "../model/MonetizzePurchaseStatus";
+import { PurchaseStatus } from "../model/PurchaseStatus";
 import { SceneContextMessageUpdate } from "telegraf/typings/stage";
 
 export default class AbstractPurchaseStatusHandler implements PurchaseStatusHandler {
@@ -15,7 +15,7 @@ export default class AbstractPurchaseStatusHandler implements PurchaseStatusHand
         return this.nextHandler;
     }
 
-    handle(purchaseStatus: MonetizzePurchaseStatus) {
+    handle(purchaseStatus: PurchaseStatus) {
         if (this.nextHandler) {
             this.nextHandler.handle(purchaseStatus)
         }

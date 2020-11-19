@@ -1,6 +1,6 @@
-import { MonetizzePurchaseStatus } from "../model/MonetizzePurchaseStatus";
+import { PurchaseStatus } from "../model/PurchaseStatus";
 
 export default interface PurchaseStatusHandler {
     setNext(handler: PurchaseStatusHandler): PurchaseStatusHandler
-    handle(purchaseStatus: MonetizzePurchaseStatus): Promise<void>
+    handle(purchaseStatus: PurchaseStatus): Promise<void>
 }
