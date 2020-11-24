@@ -1,4 +1,4 @@
-import { TELEFONE, EMAIL, CARTAO, BOLETO, SIM, NAO, PLANO } from '../util/regex';
+import { TELEFONE, EMAIL, CARTAO, BOLETO, SIM, NAO, PLANO, PLANO_EDUZZ } from '../util/regex';
 
 const validate = (informacao, dado) => {
     switch(informacao) {
@@ -17,6 +17,9 @@ const validate = (informacao, dado) => {
 const formaDePagamentoValida = (ctx) => ctx.message ? CARTAO.test(ctx.message.text) || BOLETO.test(ctx.message.text) : CARTAO.test(ctx.update.message.text) || BOLETO.test(ctx.update.message.text);
 const cartao = (ctx) => ctx.message ? CARTAO.test(ctx.message.text) : CARTAO.test(ctx.update.message.text);
 const boleto = (ctx) => ctx.message ? BOLETO.test(ctx.message.text) : BOLETO.test(ctx.update.message.text);
+const basic = (ctx) => ctx.message ? PLANO_EDUZZ.BASIC.test(ctx.message.text) : PLANO_EDUZZ.BASIC.test(ctx.update.message.text);
+const premium = (ctx) => ctx.message ? PLANO_EDUZZ.PREMIUM.test(ctx.message.text) : PLANO_EDUZZ.PREMIUM.test(ctx.update.message.text);
+const vip = (ctx) => ctx.message ? PLANO_EDUZZ.VIP.test(ctx.message.text) : PLANO_EDUZZ.VIP.test(ctx.update.message.text);
 const silver = (ctx) => ctx.message ? PLANO.SILVER.test(ctx.message.text) : PLANO.SILVER.test(ctx.update.message.text);
 const gold = (ctx) => ctx.message ? PLANO.GOLD.test(ctx.message.text) : PLANO.GOLD.test(ctx.update.message.text);
 const diamond = (ctx) => ctx.message ? PLANO.DIAMOND.test(ctx.message.text) : PLANO.DIAMOND.test(ctx.update.message.text);
@@ -24,4 +27,4 @@ const blackDiamond = (ctx) => ctx.message ? PLANO.BLACK_DIAMOND.test(ctx.message
 const confirmado = (ctx) => ctx.message ? SIM.test(ctx.message.text) : SIM.test(ctx.update.message.text);
 const negado = (ctx) => ctx.message ? NAO.test(ctx.message.text) : NAO.test(ctx.update.message.text);
 
-export { formaDePagamentoValida, cartao, boleto, confirmado, negado, silver, gold, diamond, blackDiamond, validate }
+export { formaDePagamentoValida, cartao, boleto, confirmado, negado, silver, gold, diamond, blackDiamond, validate, basic, premium, vip }

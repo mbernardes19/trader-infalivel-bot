@@ -3,13 +3,13 @@ import { Telegraf, Stage, session, Extra, Markup } from 'telegraf';
 import MainStage from './stages/MainStage';
 import dotEnv from 'dotenv';
 import { log, logError } from './logger';
-import {getUserByTelegramId, updateViewChats, getAllValidUsers, updateUsersStatusAssinatura} from './dao';
+import {getUserByTelegramId, updateViewChats} from './dao';
 import CacheService from "./services/cache";
 import path from 'path';
 dotEnv.config({path: path.join(__dirname, '..', '.env')});
 import { startChatLinkValidation } from './services/chatInviteLink';
 import { connection } from "./db";
-import { getChat } from './services/chatResolver';
+import { getChats } from './services/chatResolver';
 import { getChatInviteLink } from './services/chatInviteLink';
 import User from "./model/User";
 import { startCronJobs } from './services/cronjobs';
@@ -42,14 +42,10 @@ bot.command('canais', async ctx => {
         if (user.getUserData().statusAssinatura !== 'ativa') {
             return await ctx.reply('Você já ativou sua assinatura Monetizze comigo, porém seu status de assinatura na Monetizze não está como ativo, regularize sua situação com a Monetizze para ter acesso aos canais.');
         }
-        const { plano, dataAssinatura } = user.getUserData()
-        const [chatName, chatId] = await getChat(plano, dataAssinatura);
-        const specificChatInviteLink = getChatInviteLink(chatId);
-        const generalChatInviteLink = getChatInviteLink(process.env.ID_CANAL_GERAL);
-        const teclado = Markup.inlineKeyboard([
-            Markup.urlButton('Canal Geral', generalChatInviteLink),
-            Markup.urlButton(chatName, specificChatInviteLink)
-        ]);
+        const { plano } = user.getUserData()
+        const chats = await getChats(plano);
+        const inviteLinks = chats.map(chat => getChatInviteLink(chat));
+        const teclado = Markup.inlineKeyboard(inviteLinks.map(link => Markup.urlButton(link.chatName, link.invite)));
         await ctx.reply('É pra já!', Extra.markup(teclado))
         await updateViewChats(ctx.chat.id, connection);
     } catch (err) {
@@ -57,6 +53,30 @@ bot.command('canais', async ctx => {
         await ctx.reply('Ocorreu um erro ao verificar sua assinatura Monetizze. Tente novamente mais tarde.')
     }
 });
+
+(async () => {
+    // const eduzz = new EduzzService();
+    // const authCredentials: EduzzAuthCredentials = {email: 'grupocollab@gmail.com', publicKey: '33634949', apiKey: '4366B150AE'}
+    // await eduzz.authenticate(authCredentials);
+    // const res = await eduzz.getPurchases()
+    // res.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
+    // const res2 = await eduzz.getPurchases({page: 2})
+    // res2.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
+    // const res3 = await eduzz.getPurchases({page: 3})
+    // res3.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
+    // const res4 = await eduzz.getPurchases({page: 4})
+    // res4.data.map(s => console.log(s.content_id, s.content_title))
+    // const res5 = await eduzz.getPurchases({page: 5})
+    // res5.data.map(s => console.log(s.content_id, s.content_title))
+    // const res6 = await eduzz.getPurchases({page: 6})
+    // res6.data.map(s => console.log(s.content_id, s.content_title))
+    // const res7 = await eduzz.getPurchases({page: 7})
+    // res7.data.map(s => console.log(s.content_id, s.content_title))
+    // const res8 = await eduzz.getPurchases({page: 8})
+    // res8.data.map(s => console.log(s.content_id, s.content_title))
+    // const res9 = await eduzz.getPurchases({page: 9})
+    // res9.data.map(s => console.log(s.content_id, s.content_title))
+})()
 
 bot.command('t35t3', async ctx => {
     // const resp = await getMonetizzeProductTransaction({email: 'bonfin173@gmail.com'})
@@ -70,7 +90,7 @@ bot.command('suporte', async (ctx) => {
 });
 
 bot.on('message', async ctx => {
-    if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10)) {
+    if (ctx.chat.id === parseInt(process.env.ID_GRUPO_BLACK_DIAMOND, 10) || ctx.chat.id === parseInt(process.env.ID_GRUPO_PREMIUM, 10)) {
         return;
     }
     try {

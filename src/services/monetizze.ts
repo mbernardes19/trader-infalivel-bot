@@ -10,7 +10,8 @@ const getDiscountCouponIdFromUser = async (userEmail, userPlano) => {
         const transaction = await getMonetizzeProductTransaction({ email: userEmail })
         log(`Pegando cupom de desconto do usuário na Monetizze`);
         const transactionFromPlano = transaction.dados.filter(dado => dado.venda.plano === userPlano);
-        return transactionFromPlano[0].venda.cupom !== null ? transactionFromPlano[0].venda.cupom : '0';
+        return null;
+        // return transactionFromPlano[0].venda.cupom !== null ? transactionFromPlano[0].venda.cupom : '0';
     } catch (err) {
         logError(`ERRO AO PEGAR CUPOM DE DESCONTO DO USUÁRIO ${userEmail}`, err)
         throw err;

@@ -1,4 +1,5 @@
 import { Markup } from 'telegraf'
+import { Planos, PlanosEduzz } from './Planos';
 
 export default class Keyboard {
     static SUPPORT = Markup.inlineKeyboard([
@@ -16,11 +17,17 @@ export default class Keyboard {
         [Markup.callbackButton('📄 Boleto', 'boleto')]
     ])
 
-    static PLANOS_OPTIONS = Markup.inlineKeyboard([
+    static PLANOS_OPTIONS_MONETIZZE = Markup.inlineKeyboard([
         [Markup.callbackButton('🥈 Prata/Silver', '78914')],
         [Markup.callbackButton('🥇 Gold', '90965')],
         [Markup.callbackButton('💎 Diamond', '90966')],
         [Markup.callbackButton('💎⬛ Black Diamond', '91261')]
+    ])
+
+    static PLANOS_OPTIONS_EDUZZ = Markup.inlineKeyboard([
+        [Markup.callbackButton('BASIC', PlanosEduzz.BASIC)],
+        [Markup.callbackButton('PREMIUM', PlanosEduzz.PREMIUM)],
+        [Markup.callbackButton('VIP', PlanosEduzz.VIP)]
     ])
 
 }

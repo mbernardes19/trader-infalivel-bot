@@ -9,9 +9,9 @@ import CacheService from '../services/cache';
 import { getDiscountCouponIdFromUser, getDataAssinaturaFromUser } from '../services/monetizze';
 import { Telegram, Markup, Extra, Context } from 'telegraf';
 import { pegarDiasSobrandoDeAssinatura } from '../services/diasAssinatura';
-import { getChat } from '../services/chatResolver';
+import { getChats } from '../services/chatResolver';
 import { getChatInviteLink } from '../services/chatInviteLink';
-
+import EduzzService from "../services/eduzz";
 
 const getUserDiscountCoupon = async () => {
     const email = CacheService.getEmail();
@@ -26,7 +26,9 @@ const getUserDiscountCoupon = async () => {
 const getUserDataAssinatura = async () => {
     const email = CacheService.getEmail();
     try {
-        return await getDataAssinaturaFromUser(email);
+        const eduzzService = new EduzzService();
+        await eduzzService.authenticate({email: 'grupocollab@gmail.com', publicKey: '33634949', apiKey: '4366B150AE'})
+        return await eduzzService.getUserSubscriptionDate(email);
     } catch (err) {
         throw err;
     }
@@ -39,7 +41,7 @@ const getUserData = async (ctx): Promise<UserData> => {
         const telegramClient = CacheService.get<Telegram>('telegramClient');
         const chat = await telegramClient.getChat(ctx.chat.id)
         userData.telegramId = ctx.chat.id.toString();
-        userData.discountCouponId = await getUserDiscountCoupon();
+        userData.discountCouponId = '0';
         userData.username = chat.username;
         userData.paymentMethod = CacheService.getPaymentMethod();
         userData.plano = CacheService.getPlano();
@@ -47,7 +49,8 @@ const getUserData = async (ctx): Promise<UserData> => {
         userData.phone = CacheService.getPhone();
         userData.email = CacheService.getEmail();
         userData.dataAssinatura = await getUserDataAssinatura();
-        userData.diasAteFimDaAssinatura = await pegarDiasSobrandoDeAssinatura(CacheService.getPlano(), CacheService.getEmail())
+        userData.diasAteFimDaAssinatura = 0
+        // await pegarDiasSobrandoDeAssinatura(CacheService.getPlano(), CacheService.getEmail())
 
         log(`Username Telegram definido ${userData.username}`)
         log(`Id Telegram definido ${userData.telegramId}`)
@@ -63,28 +66,21 @@ const getUserData = async (ctx): Promise<UserData> => {
 }
 
 const enviarCanaisDeTelegram = async (ctx: Context, plano: string, dataAssinatura: string) => {
-    let chatName;
-    let chatId;
-    let linkChatEspecifico;
-    let linkCanalGeral;
+    let chats = []
+    let inviteLinks = [];
     log(`Enviando canais de Telegram para usuário ${ctx.chat.id}`)
     try {
-        [chatName, chatId] = await getChat(plano, dataAssinatura);
-        linkChatEspecifico = getChatInviteLink(chatId);
-        linkCanalGeral = getChatInviteLink(process.env.ID_CANAL_GERAL)
+        chats = await getChats(plano);
+        inviteLinks = chats.map(chat => getChatInviteLink(chat));
     } catch (err) {
         logError(`ERRO AO ENVIAR CANAIS DE TELEGRAM`, err)
         await enviarMensagemDeErroAoAdmin(`ERRO AO ENVIAR CANAIS DE TELEGRAM`, err);
         throw err;
     }
 
-    log(`Canal Geral enviado para ${ctx.chat.id}`)
-    log(`Canal Específico (${plano}) enviado para ${ctx.chat.id}`)
+    log(`Canal (${plano}) enviado para ${ctx.chat.id}`)
 
-    const teclado = Markup.inlineKeyboard([
-        Markup.urlButton('Canal Geral', linkCanalGeral),
-        Markup.urlButton(chatName, linkChatEspecifico)
-    ])
+    const teclado = Markup.inlineKeyboard(inviteLinks.map(link => Markup.urlButton(link.chatName, link.invite)));
     await ctx.reply('Seja bem-vindo(a)!')
     await ctx.reply('Clique agora nos dois botões e acesse nossos canais o quanto antes, logo esses botões vão expirar ⤵️', Extra.markup(teclado))
     return await ctx.replyWithMarkdown('Caso eles já tenham expirado quando você clicar, utilize o comando /canais para recebê-los atualizados!\n\n*OBS.: Você só pode receber os canais por esse comando 2 vezes.*');

@@ -1,8 +1,8 @@
 import { Extra } from 'telegraf';
 import CacheService from '../services/cache';
 import { log } from '../logger';
-import { silver, gold, diamond, blackDiamond } from '../services/validate';
-import { Planos } from '../model/Planos';
+import { silver, gold, diamond, blackDiamond, basic, premium, vip } from '../services/validate';
+import { Planos, PlanosEduzz } from '../model/Planos';
 import Scene from '../model/Scene';
 import Keyboard from '../model/Keyboard';
 
@@ -25,59 +25,47 @@ const askForPlano = async (ctx) => {
 const showPlanoOptions = async (ctx) => {
     log(`Enviando opções de PLANO para ${ctx.chat.id}`)
     try {
-        await ctx.reply("Qual foi o plano que você contratou?", Extra.markup(Keyboard.PLANOS_OPTIONS))
+        await ctx.reply("Qual foi o plano que você contratou?", Extra.markup(Keyboard.PLANOS_OPTIONS_EDUZZ))
     } catch (err) {
         log(`ERRO AO ENVIAR MENSAGEM DE PEDIDO DE PLANO ${err}`)
     }
 }
 
-planoScene.onAction(Planos.SILVER, async (ctx) => {
-    await savePlano(Planos.SILVER);
+planoScene.onAction(PlanosEduzz.BASIC, async (ctx) => {
+    await savePlano(PlanosEduzz.BASIC);
     await ctx.scene.enter('name');
 })
 
-planoScene.onAction(Planos.GOLD, async (ctx) => {
-    await savePlano(Planos.GOLD);
+planoScene.onAction(PlanosEduzz.PREMIUM, async (ctx) => {
+    await savePlano(PlanosEduzz.PREMIUM);
     await ctx.scene.enter('name');
 })
 
-planoScene.onAction(Planos.DIAMOND, async (ctx) => {
-    await savePlano(Planos.DIAMOND);
-    await ctx.scene.enter('name');
-})
-
-planoScene.onAction(Planos.BLACK_DIAMOND, async (ctx) => {
-    await savePlano(Planos.BLACK_DIAMOND);
+planoScene.onAction(PlanosEduzz.VIP, async (ctx) => {
+    await savePlano(PlanosEduzz.VIP);
     await ctx.scene.enter('name');
 })
 
 planoScene.use(async (ctx) => {
-    if (silver(ctx)) {
+    if (basic(ctx)) {
         if (!ctx.message) {
             await ctx.answerCbQuery()
         }
-        await savePlano(Planos.SILVER);
+        await savePlano(PlanosEduzz.BASIC);
         return await ctx.scene.enter('name');
     }
-    if (gold(ctx)) {
+    if (premium(ctx)) {
         if (!ctx.message) {
             await ctx.answerCbQuery()
         }
-        await savePlano(Planos.GOLD);
+        await savePlano(PlanosEduzz.PREMIUM);
         return await ctx.scene.enter('name');
     }
-    if (diamond(ctx)) {
+    if (vip(ctx)) {
         if (!ctx.message) {
             await ctx.answerCbQuery()
         }
-        await savePlano(Planos.DIAMOND);
-        return await ctx.scene.enter('name');
-    }
-    if (blackDiamond(ctx)) {
-        if (!ctx.message) {
-            await ctx.answerCbQuery()
-        }
-        await savePlano(Planos.BLACK_DIAMOND);
+        await savePlano(PlanosEduzz.VIP);
         return await ctx.scene.enter('name');
     }
     await ctx.reply('Por favor, escolha uma das opções acima');
