@@ -26,8 +26,8 @@ export default class Keyboard {
 
     static PLANOS_OPTIONS_EDUZZ = Markup.inlineKeyboard([
         [Markup.callbackButton('BASIC', PlanosEduzz.BASIC)],
-        [Markup.callbackButton('PREMIUM', PlanosEduzz.PREMIUM)],
-        [Markup.callbackButton('VIP', PlanosEduzz.VIP)]
+        [Markup.callbackButton('VIP', PlanosEduzz.VIP)],
+        [Markup.callbackButton('PREMIUM', PlanosEduzz.PREMIUM)]
     ])
 
 }

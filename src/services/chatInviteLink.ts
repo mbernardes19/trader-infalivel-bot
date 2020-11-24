@@ -1,5 +1,4 @@
 import { Telegram } from 'telegraf';
-import CacheService from '../services/cache';
 import { log, logError, enviarMensagemDeErroAoAdmin } from '../logger';
 
 const { ID_CANAL_BASIC, ID_CANAL_VIP, ID_GRUPO_PREMIUM } = process.env
@@ -8,10 +7,9 @@ let linkCanalBasic = ''
 let linkCanalVip = ''
 let linkGrupoPremium = ''
 
-const exportChatsInviteLink = async () => {
+const exportChatsInviteLink = async (telegramClient: Telegram) => {
     log(`🔗💬 GERANDO NOVOS LINKS PARA OS CHAT!`)
     try {
-        const telegramClient = CacheService.get<Telegram>('telegramClient')
         linkCanalBasic = await telegramClient.exportChatInviteLink(ID_CANAL_BASIC)
         linkCanalVip = await telegramClient.exportChatInviteLink(ID_CANAL_VIP)
         linkGrupoPremium = await telegramClient.exportChatInviteLink(ID_GRUPO_PREMIUM)
@@ -23,20 +21,21 @@ const exportChatsInviteLink = async () => {
     }
 }
 
-const startChatLinkValidation = () => {
+const startChatLinkValidation = (telegramClient: Telegram) => {
     log(`VALIDAÇÃO DE LINKS INICIADA!`);
-    exportChatsInviteLink();
-    setInterval(async () => await exportChatsInviteLink(), 300000)
+    exportChatsInviteLink(telegramClient);
+    setInterval(async () => await exportChatsInviteLink(telegramClient), 300000)
 }
 
 const getChatInviteLink = (chatId: number) => {
     log(`Pegando link para chat ${chatId}`)
+    console.log('VIP', process.env.ID_CANAL_VIP)
     switch(chatId) {
-        case parseInt(ID_CANAL_BASIC):
+        case parseInt(process.env.ID_CANAL_BASIC):
             return {chatName: 'BASIC', invite: linkCanalBasic};
-        case parseInt(ID_CANAL_VIP):
+        case parseInt(process.env.ID_CANAL_VIP):
             return {chatName: 'VIP', invite: linkCanalVip};
-        case parseInt(ID_GRUPO_PREMIUM):
+        case parseInt(process.env.ID_GRUPO_PREMIUM):
             return {chatName: 'PREMIUM', invite: linkGrupoPremium};
 
         default:
@@ -44,4 +43,4 @@ const getChatInviteLink = (chatId: number) => {
     }
 }
 
-export { getChatInviteLink, startChatLinkValidation }
+export { getChatInviteLink, startChatLinkValidation, exportChatsInviteLink }
