@@ -1,8 +1,8 @@
 import Purchase from './Purchase';
 
 export default class MonetizzePurchase extends Purchase {
-    constructor(email: string) {
-        super(email);
+    constructor(email: string, plano: string) {
+        super(email, plano);
         this._coursePlatformService.platformName = 'Monetizze';
     }
 }
