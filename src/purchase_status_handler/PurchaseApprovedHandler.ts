@@ -11,6 +11,7 @@ import { getChats } from '../services/chatResolver';
 import { getChatInviteLink } from '../services/chatInviteLink';
 import EduzzService from "../services/eduzz";
 import { SceneContextMessageUpdate } from "telegraf/typings/stage";
+import { pegarDiasSobrandoDeAssinatura } from "../services/diasAssinaturaEduzz";
 
 const getUserDataAssinatura = async (ctx: SceneContextMessageUpdate) => {
     const email = ctx.scene.session.state['email'];
@@ -38,7 +39,7 @@ const getUserData = async (ctx: SceneContextMessageUpdate): Promise<UserData> =>
         userData.phone = ctx.scene.session.state['phone'];
         userData.email = ctx.scene.session.state['email'];
         userData.dataAssinatura = await getUserDataAssinatura(ctx);
-        userData.diasAteFimDaAssinatura = 0
+        userData.diasAteFimDaAssinatura = await pegarDiasSobrandoDeAssinatura(ctx.scene.session.state['plano'], ctx.scene.session.state['email']);
 
         log(`Username Telegram definido ${userData.username}`)
         log(`Id Telegram definido ${userData.telegramId}`)

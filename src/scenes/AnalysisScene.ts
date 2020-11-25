@@ -14,7 +14,6 @@ analysisScene.onEnter(async ctx => {
     const plano = ctx.scene.session.state['plano'];
     const eduzzService = await authenticateOnEduzz();
     const eduzzPurchase = new EduzzPurchase(email, plano, eduzzService);
-    console.log(ctx.scene.session.state)
     let purchaseStatus;
     try {
         purchaseStatus = await eduzzPurchase.getStatus();

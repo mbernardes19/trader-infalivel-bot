@@ -15,13 +15,15 @@ import User from "./model/User";
 import { startCronJobs } from './services/cronjobs';
 import { getMonetizzeProductTransaction } from './services/request'
 import Keyboard from "./model/Keyboard";
+import EduzzService from "./services/eduzz";
+import { EduzzAuthCredentials } from "./interfaces/Eduzz";
 
 const botToken = process.env.NODE_ENV === 'production' ? process.env.BOT_TOKEN : process.env.TEST_BOT_TOKEN;
 const bot = new Telegraf(botToken);
 
 CacheService.save('telegramClient', bot.telegram);
 
-startChatLinkValidation();
+startChatLinkValidation(bot.telegram);
 startCronJobs();
 
 bot.use(session())
@@ -58,7 +60,7 @@ bot.command('canais', async ctx => {
     // const eduzz = new EduzzService();
     // const authCredentials: EduzzAuthCredentials = {email: 'grupocollab@gmail.com', publicKey: '33634949', apiKey: '4366B150AE'}
     // await eduzz.authenticate(authCredentials);
-    // const res = await eduzz.getPurchases()
+    // const res = await eduzz.getPurchases({client_email: 'paulosilva42@outlook.com.br'})
     // res.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
     // const res2 = await eduzz.getPurchases({page: 2})
     // res2.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
@@ -109,3 +111,5 @@ app.get('/', (req: Request, res: Response) => {
 const PORT = process.env.PORT_TRADER_INFALIVEL_BOT_DIST_MAIN || process.env.PORT_MAIN || 4000
 console.log('PORTA', PORT)
 app.listen(PORT, () => log('conectado na porta 3000'))
+
+export {bot}

@@ -13,7 +13,7 @@ const startCronJobs = () => {
     try {
         removeInvalidUsers();
         updateValidUsersStatusAssinatura();
-        // updateValidUsersDiasAteFimAssinatura();
+        updateValidUsersDiasAteFimAssinatura();
         sendCsvReportToEmail();
     } catch (err) {
         logError(`ERRO AO EXECUTAR CRONJOB`, err)

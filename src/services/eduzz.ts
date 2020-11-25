@@ -67,7 +67,7 @@ export default class EduzzService extends CoursePlatformService<EduzzSaleOptions
 
     async checkIfPaymentMethodIsBoleto(userEmail: string): Promise<boolean> {
         const salesResponse = await this.getPurchases({client_email: userEmail});
-        if (salesResponse.data[0].sale_payment_method.includes('Boleto')) {
+        if (salesResponse.data[0] && salesResponse.data[0].sale_payment_method.includes('Boleto')) {
             return true;
         } else {
             return false;
@@ -76,6 +76,8 @@ export default class EduzzService extends CoursePlatformService<EduzzSaleOptions
 
     async getUserSubscriptionDate(userEmail: string) {
         const salesResponse = await this.getPurchases({client_email: userEmail});
-        return salesResponse.data[0].date_create as any;
+        const responseData = salesResponse.data[0]
+        const subDate = responseData.date_payment || responseData.date_update || responseData.date_create
+        return subDate as any;
     }
 }

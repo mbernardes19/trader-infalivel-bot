@@ -15,9 +15,9 @@ export interface EduzzResponse extends ApiResponse {
 export interface EduzzSale {
     sale_id: number;
     contract_id?: number;
-    date_create?: Date;
-    date_payment?: Date;
-    date_update?: Date;
+    date_create?: string;
+    date_payment?: string;
+    date_update?: string;
     sale_status?: number;
     sale_status_name?: string;
     sale_payment_method?: string
