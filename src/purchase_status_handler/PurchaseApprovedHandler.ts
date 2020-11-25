@@ -6,25 +6,14 @@ import { connection } from '../db';
 import User from '../model/User';
 import UserData from '../model/UserData';
 import CacheService from '../services/cache';
-import { getDiscountCouponIdFromUser, getDataAssinaturaFromUser } from '../services/monetizze';
 import { Telegram, Markup, Extra, Context } from 'telegraf';
-import { pegarDiasSobrandoDeAssinatura } from '../services/diasAssinatura';
 import { getChats } from '../services/chatResolver';
 import { getChatInviteLink } from '../services/chatInviteLink';
 import EduzzService from "../services/eduzz";
+import { SceneContextMessageUpdate } from "telegraf/typings/stage";
 
-const getUserDiscountCoupon = async () => {
-    const email = CacheService.getEmail();
-    const plano = CacheService.getPlano();
-    try {
-        return await getDiscountCouponIdFromUser(email, plano)
-    } catch (err) {
-        throw err;
-    }
-}
-
-const getUserDataAssinatura = async () => {
-    const email = CacheService.getEmail();
+const getUserDataAssinatura = async (ctx: SceneContextMessageUpdate) => {
+    const email = ctx.scene.session.state['email'];
     try {
         const eduzzService = new EduzzService();
         await eduzzService.authenticate({email: 'grupocollab@gmail.com', publicKey: '33634949', apiKey: '4366B150AE'})
@@ -34,7 +23,7 @@ const getUserDataAssinatura = async () => {
     }
 }
 
-const getUserData = async (ctx): Promise<UserData> => {
+const getUserData = async (ctx: SceneContextMessageUpdate): Promise<UserData> => {
     log(`Pegando dados de usuário ${ctx.chat.id}`);
     try {
         const userData: UserData = new UserData();
@@ -43,14 +32,13 @@ const getUserData = async (ctx): Promise<UserData> => {
         userData.telegramId = ctx.chat.id.toString();
         userData.discountCouponId = '0';
         userData.username = chat.username;
-        userData.paymentMethod = CacheService.getPaymentMethod();
-        userData.plano = CacheService.getPlano();
-        userData.fullName = CacheService.getFullName();
-        userData.phone = CacheService.getPhone();
-        userData.email = CacheService.getEmail();
-        userData.dataAssinatura = await getUserDataAssinatura();
+        userData.paymentMethod = ctx.scene.session.state['paymentMethod'];
+        userData.plano = ctx.scene.session.state['plano'];
+        userData.fullName = ctx.scene.session.state['fullName'];
+        userData.phone = ctx.scene.session.state['phone'];
+        userData.email = ctx.scene.session.state['email'];
+        userData.dataAssinatura = await getUserDataAssinatura(ctx);
         userData.diasAteFimDaAssinatura = 0
-        // await pegarDiasSobrandoDeAssinatura(CacheService.getPlano(), CacheService.getEmail())
 
         log(`Username Telegram definido ${userData.username}`)
         log(`Id Telegram definido ${userData.telegramId}`)
@@ -97,9 +85,9 @@ const saveUser = async (newUser: User) => {
     }
 }
 
-const endConversation = async (ctx) => {
+const endConversation = async (ctx: SceneContextMessageUpdate) => {
     log(`Conversa com ${ctx.chat.id} finalizada`)
-    CacheService.clearAllUserData();
+    ctx.scene.session.state = {};
     return ctx.scene.leave();
 }
 

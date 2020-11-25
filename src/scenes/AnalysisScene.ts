@@ -1,18 +1,20 @@
-import CacheService from '../services/cache';
 import { logError, log } from '../logger';
 import Scene from '../model/Scene';
 import handlePurchaseStatus from '../purchase_status_handler/index';
 import EduzzPurchase from '../model/EduzzPurchase';
 import EduzzService from '../services/eduzz';
 import { EduzzAuthCredentials } from '../interfaces/Eduzz';
+import { SceneContextMessageUpdate } from 'telegraf/typings/stage';
 
 const analysisScene = new Scene('analysis')
 
 analysisScene.onEnter(async ctx => {
     await ctx.reply('Verificando sua compra nos servidores da Eduzz...');
-    const email = CacheService.getEmail();
+    const email = ctx.scene.session.state['email'];
+    const plano = ctx.scene.session.state['plano'];
     const eduzzService = await authenticateOnEduzz();
-    const eduzzPurchase = new EduzzPurchase(email, eduzzService);
+    const eduzzPurchase = new EduzzPurchase(email, plano, eduzzService);
+    console.log(ctx.scene.session.state)
     let purchaseStatus;
     try {
         purchaseStatus = await eduzzPurchase.getStatus();
@@ -32,9 +34,9 @@ const authenticateOnEduzz = async (): Promise<EduzzService> => {
     return eduzzService;
 }
 
-const endConversation = async (ctx) => {
+const endConversation = async (ctx: SceneContextMessageUpdate) => {
     log(`Conversa com ${ctx.chat.id} finalizada`)
-    CacheService.clearAllUserData();
+    ctx.scene.session.state = {};
     return ctx.scene.leave();
 }
 

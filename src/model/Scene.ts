@@ -1,6 +1,5 @@
 import { BaseScene, Extra } from "telegraf"
 import { SceneContextMessageUpdate } from "telegraf/typings/stage";
-import CacheService from "../services/cache";
 import { log } from '../logger';
 import { ActionFunction } from "../interfaces/ActionFunction";
 import Keyboard from "./Keyboard";
@@ -15,18 +14,18 @@ export default class Scene extends BaseScene<SceneContextMessageUpdate> {
     private addDefaultCommands() {
         this.command('reiniciar', ctx => {
             log(`Reiniciando bot por ${ctx.chat.id}`)
-            CacheService.clearAllUserData()
+            ctx.scene.session.state = {};
             return ctx.scene.enter('welcome')
         })
         this.command('parar', async ctx => {
             log(`Parando bot por ${ctx.chat.id}`)
-            CacheService.clearAllUserData()
+            ctx.scene.session.state = {};
             return await ctx.scene.leave()
         })
         this.command('suporte', async ctx => {
             log(`Enviando suporte para ${ctx.chat.id}`)
             await ctx.reply('Para falar com o suporte, clique abaixo ⤵️', Extra.markup(Keyboard.SUPPORT))
-            CacheService.clearAllUserData()
+            ctx.scene.session.state = {};
             return await ctx.scene.leave()
         })
     }

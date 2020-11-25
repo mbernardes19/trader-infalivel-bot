@@ -1,14 +1,17 @@
 import { PurchaseStatus } from './PurchaseStatus';
 import { logError, enviarMensagemDeErroAoAdmin } from '../logger';
 import CoursePlatformService, { ApiResponse, Options } from '../services/coursePlatform';
+import { SceneContextMessageUpdate } from 'telegraf/typings/stage';
 
 export default abstract class Purchase {
     protected _email: string
+    protected _plano: string
     protected _status: PurchaseStatus
     protected _coursePlatformService: CoursePlatformService<Options, ApiResponse>;
 
-    constructor(email: string) {
+    constructor(email: string, plano: string) {
         this._email = email
+        this._plano = plano
     }
 
     setStatus(newStatus: PurchaseStatus) {
@@ -26,7 +29,7 @@ export default abstract class Purchase {
 
     private async checkProduct(): Promise<boolean> {
         try {
-            return this._coursePlatformService.confirmProduct(this._email);
+            return this._coursePlatformService.confirmProduct(this._email, this._plano);
         } catch (err) {
             logError(`Erro ao verificar o plano da compra de usuário na ${this._coursePlatformService.platformName}`, err)
             await enviarMensagemDeErroAoAdmin(`Erro ao verificar o plano da compra de usuário na ${this._coursePlatformService.platformName}`, err);

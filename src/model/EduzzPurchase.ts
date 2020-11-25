@@ -3,8 +3,8 @@ import Purchase from './Purchase';
 
 export default class EduzzPurchase extends Purchase {
 
-    constructor(email: string, eduzzService: EduzzService) {
-        super(email);
+    constructor(email: string, plano: string, eduzzService: EduzzService) {
+        super(email, plano);
         this._coursePlatformService = eduzzService;
     }
 }

@@ -1,11 +1,11 @@
 import AbstractPurchaseStatusHandler from "./AbstractPurchaseStatusHandler"
 import { PurchaseStatus } from "../model/PurchaseStatus";
 import { log } from '../logger';
-import CacheService from '../services/cache';
+import { SceneContextMessageUpdate } from "telegraf/typings/stage";
 
-const endConversation = async (ctx) => {
+const endConversation = async (ctx: SceneContextMessageUpdate) => {
     log(`Conversa com ${ctx.chat.id} finalizada`)
-    CacheService.clearAllUserData();
+    ctx.scene.session.state = {};
     return ctx.scene.leave();
 }
 

@@ -8,7 +8,7 @@ welcomeScene.onEnter(async (ctx) => {
         return await ctx.scene.leave();
     }
     await welcome(ctx);
-    await ctx.scene.enter('payment')
+    await ctx.scene.enter('payment', ctx.scene.session.state)
 })
 
 const welcome = async (ctx) => {

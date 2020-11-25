@@ -1,6 +1,5 @@
 import HttpService from './http';
 import { EduzzResponse, EduzzSaleOptions, EduzzSaleStatus, EduzzAuthCredentials } from '../interfaces/Eduzz';
-import CacheService from './cache';
 import CoursePlatformService from './coursePlatform';
 import { PlanosEduzz } from '../model/Planos';
 
@@ -50,16 +49,16 @@ export default class EduzzService extends CoursePlatformService<EduzzSaleOptions
         }
     }
 
-    async confirmProduct(userEmail: string): Promise<boolean> {
+    async confirmProduct(userEmail: string, plano?: string): Promise<boolean> {
         const salesResponse = await this.getPurchases({client_email: userEmail})
         if (salesResponse.data[0].content_id === parseInt(PlanosEduzz.BASIC) || salesResponse.data[0].content_id === parseInt(PlanosEduzz.basic)) {
-            if (CacheService.getPlano() === PlanosEduzz.BASIC || CacheService.getPlano() === PlanosEduzz.basic) {
+            if (plano === PlanosEduzz.BASIC || plano === PlanosEduzz.basic) {
                 return true;
             } else {
                 return false;
             }
         }
-        if (salesResponse.data[0].content_id !== parseInt(CacheService.getPlano())) {
+        if (salesResponse.data[0].content_id !== parseInt(plano)) {
             return false;
         } else {
             return true;

@@ -1,9 +1,10 @@
 import { Extra } from 'telegraf';
-import CacheService from '../services/cache';
 import { log } from '../logger';
 import { cartao, boleto } from '../services/validate';
 import Scene from '../model/Scene';
 import Keyboard from '../model/Keyboard';
+import { closestIndexTo } from 'date-fns';
+import { SceneContextMessageUpdate } from 'telegraf/typings/stage';
 
 const paymentScene = new Scene('payment')
 
@@ -21,13 +22,13 @@ const showPaymentOptions = async (ctx) => {
 }
 
 paymentScene.onAction('cartao_de_credito', async (ctx) => {
-    await savePaymentMethod('cartao_de_credito');
-    await ctx.scene.enter('plano');
+    await savePaymentMethod('cartao_de_credito', ctx);
+    await ctx.scene.enter('plano', ctx.scene.session.state);
 })
 
 paymentScene.onAction('boleto', async (ctx) => {
-    await savePaymentMethod('boleto');
-    await ctx.scene.enter('plano');
+    await savePaymentMethod('boleto', ctx);
+    await ctx.scene.enter('plano', ctx.scene.session.state);
 })
 
 paymentScene.use(async (ctx) => {
@@ -35,21 +36,21 @@ paymentScene.use(async (ctx) => {
         if (!ctx.message) {
             await ctx.answerCbQuery()
         }
-        await savePaymentMethod('cartao_de_credito');
-        return await ctx.scene.enter('plano');
+        await savePaymentMethod('cartao_de_credito', ctx);
+        return await ctx.scene.enter('plano', ctx.scene.session.state);
     }
     if (boleto(ctx)) {
         if (!ctx.message) {
             await ctx.answerCbQuery()
         }
-        await savePaymentMethod('boleto');
-        return await ctx.scene.enter('plano');
+        await savePaymentMethod('boleto', ctx);
+        return await ctx.scene.enter('plano', ctx.scene.session.state);
     }
     await ctx.reply('Por favor, escolha uma das opções acima');
 });
 
-const savePaymentMethod = async (paymentMethod) => {
-    CacheService.savePaymentMethod(paymentMethod);
+const savePaymentMethod = async (paymentMethod, ctx: SceneContextMessageUpdate) => {
+    ctx.scene.session.state = {...ctx.scene.session.state, paymentMethod}
     log(`Forma de pagamento definida ${paymentMethod}`);
 }
 

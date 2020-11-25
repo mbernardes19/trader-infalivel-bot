@@ -1,8 +1,8 @@
 import { getMonetizzeProductTransaction } from './request';
 import { log, logError } from '../logger';
-import CacheService from './cache';
 import User from '../model/User';
 import { MonetizzeTransactionResponse } from '../interfaces/Monetizze'
+import { SceneContextMessageUpdate } from 'telegraf/typings/stage';
 
 const getDiscountCouponIdFromUser = async (userEmail, userPlano) => {
     log(`Pegando cupom de desconto de usuário ${userEmail}`)
@@ -11,7 +11,6 @@ const getDiscountCouponIdFromUser = async (userEmail, userPlano) => {
         log(`Pegando cupom de desconto do usuário na Monetizze`);
         const transactionFromPlano = transaction.dados.filter(dado => dado.venda.plano === userPlano);
         return null;
-        // return transactionFromPlano[0].venda.cupom !== null ? transactionFromPlano[0].venda.cupom : '0';
     } catch (err) {
         logError(`ERRO AO PEGAR CUPOM DE DESCONTO DO USUÁRIO ${userEmail}`, err)
         throw err;
@@ -61,11 +60,11 @@ const verifyUserPurchase = async (email) => {
     }
 }
 
-const confirmPlano = async (email) => {
+const confirmPlano = async (email, ctx: SceneContextMessageUpdate) => {
     try {
         log(`Confirmando plano de usuário na Monetizze ${email}`)
         const responseCompletas = await getMonetizzeProductTransaction({ email })
-        return responseCompletas.dados[0].plano.codigo !== CacheService.getPlano() ? false : true;
+        return responseCompletas.dados[0].plano.codigo !== ctx.scene.session.state['plano'] ? false : true;
     } catch (err) {
         logError(`ERRO AO VERIFICAR PLANO NA COMPRA DE ${email}`, err)
         throw err

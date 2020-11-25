@@ -16,6 +16,6 @@ export default abstract class CoursePlatformService<O extends Options, R extends
     abstract authenticate(authCredentials: AuthCredentials): void;
     abstract getPurchases(options?: O): Promise<R>;
     abstract verifyUserPurchase(userEmail: string): Promise<boolean>;
-    abstract confirmProduct(userEmail: string): Promise<boolean>;
+    abstract confirmProduct(userEmail: string, plano: string): Promise<boolean>;
     abstract checkIfPaymentMethodIsBoleto(userEmail: string): Promise<boolean>;
 }

@@ -1,14 +1,15 @@
 import { Extra } from 'telegraf';
-import CacheService from '../services/cache';
 import { log } from '../logger';
 import { confirmado, negado } from '../services/validate';
 import Scene from '../model/Scene';
 import Keyboard from '../model/Keyboard';
+import { closestIndexTo } from 'date-fns';
+import { SceneContextMessageUpdate } from 'telegraf/typings/stage';
 
 const nameScene = new Scene('name');
 
 nameScene.onEnter(async (ctx) => {
-    if (!CacheService.getFullName()) {
+    if (!ctx.scene.session.state['fullName']) {
         return await askForFullName(ctx);
     }
     await askForFullNameAgain(ctx);
@@ -16,7 +17,7 @@ nameScene.onEnter(async (ctx) => {
 
 nameScene.use(async (ctx) => {
     await confirmFullName(ctx);
-    await saveFullName(ctx.message.text);
+    await saveFullName(ctx.message.text, ctx);
 });
 
 const askForFullName = async (ctx) => {
@@ -30,35 +31,35 @@ const askForFullNameAgain = async (ctx) => {
 
 const confirmFullName = async (ctx) => {
     await ctx.reply(`Confirmando... seu nome completo é ${ctx.message.text}?`, Extra.inReplyTo(ctx.update.message.message_id).markup(Keyboard.CONFIRMATION));
-    return ctx.scene.enter('confirm_name');
+    return ctx.scene.enter('confirm_name', ctx.scene.session.state);
 }
 
-const saveFullName = async (fullname) => {
+const saveFullName = async (fullName, ctx: SceneContextMessageUpdate) => {
     log('salvou o nome')
-    CacheService.saveFullName(fullname);
-    log(`Nome completo definido ${fullname}`);
+    ctx.scene.session.state = {...ctx.scene.session.state, fullName}
+    log(`Nome completo definido ${fullName}`);
 }
 
 const confirmNameScene = new Scene('confirm_name');
 
 confirmNameScene.onAction('sim', async (ctx) => {
-    const nome = CacheService.getFullName();
+    const nome = ctx.scene.session.state['fullName']
     await ctx.reply(`Beleza, ${nome.includes(' ') ? nome.substring(0, nome.indexOf(' ')) : nome}!`);
-    return ctx.scene.enter('phone');
+    return ctx.scene.enter('phone', ctx.scene.session.state);
 });
 
 confirmNameScene.onAction('nao', async (ctx) => {
-    return ctx.scene.enter('name');
+    return ctx.scene.enter('name', ctx.scene.session.state);
 });
 
 confirmNameScene.use(async (ctx) => {
     if (confirmado(ctx)) {
-        const nome = CacheService.getFullName();
+        const nome = ctx.scene.session.state['fullName'];
         await ctx.reply(`Beleza, ${nome.includes(' ') ? nome.substring(0, nome.indexOf(' ')) : nome}!`);
-        return ctx.scene.enter('phone');
+        return ctx.scene.enter('phone', ctx.scene.session.state);
     }
     if (negado(ctx)) {
-        return ctx.scene.enter('name');
+        return ctx.scene.enter('name', ctx.scene.session.state);
     }
     await ctx.reply('Por favor, escolha uma das opções acima');
 });
