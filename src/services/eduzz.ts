@@ -2,6 +2,9 @@ import HttpService from './http';
 import { EduzzResponse, EduzzSaleOptions, EduzzSaleStatus, EduzzAuthCredentials } from '../interfaces/Eduzz';
 import CoursePlatformService from './coursePlatform';
 import { PlanosEduzz } from '../model/Planos';
+import User from '../model/User';
+import { log } from 'console';
+import { logError } from '../logger';
 
 export default class EduzzService extends CoursePlatformService<EduzzSaleOptions, EduzzResponse> {
     private _httpService: HttpService;
@@ -79,5 +82,45 @@ export default class EduzzService extends CoursePlatformService<EduzzSaleOptions
         const responseData = salesResponse.data[0]
         const subDate = responseData.date_payment || responseData.date_update || responseData.date_create
         return subDate as any;
+    }
+
+    async getUsersNewStatusAssinatura(users: User[]) {
+        log(`Pegando novos status de assinatura para usuários ${users}`)
+        const usersToUpdatePromise = [];
+        users.forEach(user => {
+            const { email } = user.getUserData();
+            usersToUpdatePromise.push(this.getPurchases({client_email: email}))
+        })
+        try {
+            const usersToUpdate: EduzzResponse[] = await Promise.all(usersToUpdatePromise)
+            return usersToUpdate.map(user => {
+                if (user.data[0]) {
+                    if (user.data[0].sale_status_name === 'Paga') {
+                        return 'ativa';
+                    }
+                    if (user.data[0].sale_status_name === 'Aberta') {
+                        return 'aberta';
+                    }
+                    if (user.data[0].sale_status_name === 'Aguardando Reembolso') {
+                        return 'aguardando_reembolso';
+                    }
+                    if (user.data[0].sale_status_name === 'Cancelada') {
+                        return 'cancelada';
+                    }
+                    if (user.data[0].sale_status_name.includes('Em Rec')) {
+                        return 'em_recuperacao';
+                    }
+                    if (user.data[0].sale_status_name === 'Expirada') {
+                        return 'expirada';
+                    }
+                    if (user.data[0].sale_status_name === 'Reembolsado') {
+                        return 'reembolsado';
+                    }
+                }
+            })
+        } catch (err) {
+            logError(`ERRO AO PEGAR NOVO STATUS DE ASSINATURA DE USUÁRIOS ${users}`, err);
+            throw err;
+        }
     }
 }

@@ -1,5 +1,5 @@
 import Cron from 'node-cron';
-import { getAllInvalidNonKickedUsers, getAllUsers, markUserAsKicked, getAllValidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, getAllValidUsersWithPaymentBoleto } from '../dao';
+import { getAllInvalidNonKickedUsers, getAllUsers, markUserAsKicked, getAllValidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, getAllValidUsersWithPaymentBoleto, updateUsersStatusAssinaturaEduzz } from '../dao';
 import { connection } from '../db';
 import CacheService from './cache';
 import { Telegram } from 'telegraf';
@@ -66,7 +66,7 @@ const updateValidUsersStatusAssinatura = () => {
             let start = 0
             let theresold = 10
             const intervalId = setInterval(async () => {
-                await updateUsersStatusAssinatura(allUsers.slice(start, theresold), connection);
+                await updateUsersStatusAssinaturaEduzz(allUsers.slice(start, theresold), connection);
                 if (theresold >= allUsers.length) {
                     log('Todos usuários atualizados com sucesso')
                     clearInterval(intervalId)

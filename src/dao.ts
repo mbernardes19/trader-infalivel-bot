@@ -4,7 +4,8 @@ import User from './model/User';
 import { getUsersNewStatusAssinatura } from './services/monetizze';
 import { log, logError } from './logger';
 import { pegarDiasSobrandoDeAssinatura } from './services/diasAssinatura';
-
+import EduzzService from './services/eduzz';
+import { EduzzAuthCredentials } from './interfaces/Eduzz';
 
 const addUserToDatabase = async (user: User, connection: Connection) => {
     const userData = user.getUserData();
@@ -106,6 +107,32 @@ const updateUsersStatusAssinatura = async (users: User[], connection: Connection
     }
 }
 
+const updateUsersStatusAssinaturaEduzz = async (users: User[], connection: Connection) => {
+    log(`Iniciando atualização de status de usuários ${users}`)
+    const eduzzService = new EduzzService();
+    const authCredentials: EduzzAuthCredentials = {email: 'grupocollab@gmail.com', publicKey: '33634949', apiKey: '4366B150AE'}
+    await eduzzService.authenticate(authCredentials);
+    const query = util.promisify(connection.query).bind(connection);
+    let newStatusAssinatura;
+    try {
+        newStatusAssinatura = await eduzzService.getUsersNewStatusAssinatura(users);
+    } catch (err) {
+        throw err;
+    }
+
+    const updates = []
+    users.forEach((user, index) => {
+        updates.push(query(`update Users set status_assinatura='${newStatusAssinatura[index]}' where id_telegram='${user.getUserData().telegramId}'`));
+    })
+    try {
+        await Promise.all(updates);
+        log(`Atualização de status realizada com sucesso!`)
+    } catch (err) {
+        logError(`ERRO AO ATUALIZAR STATUS DE ASSINATURA DE USUÁRIOS ${users}`, err);
+        throw err;
+    }
+}
+
 const updateUsersDiasAteFimAssinatura = async (users: User[], connection: Connection) => {
     log(`Iniciando atualização de dias até fim de assinatura ${users}`)
 
@@ -159,4 +186,4 @@ const updateViewChats = async (telegramId: string|number, connection: Connection
     }
 }
 
-export { addUserToDatabase, getAllValidUsersWithPaymentBoleto, getUserByTelegramId, getAllValidUsers, getAllUsers, getAllInvalidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateViewChats }
+export { addUserToDatabase, getAllValidUsersWithPaymentBoleto, getUserByTelegramId, getAllValidUsers, getAllUsers, getAllInvalidUsers, updateUsersStatusAssinatura, updateUsersDiasAteFimAssinatura, markUserAsKicked, getAllInvalidNonKickedUsers, updateUsersStatusAssinaturaEduzz, updateViewChats }
