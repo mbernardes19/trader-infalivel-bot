@@ -99,7 +99,7 @@ export default class EduzzService extends CoursePlatformService<EduzzSaleOptions
                         return 'ativa';
                     }
                     if (user.data[0].sale_status_name === 'Aberta') {
-                        return 'aberta';
+                        return 'ativa';
                     }
                     if (user.data[0].sale_status_name === 'Aguardando Reembolso') {
                         return 'aguardando_reembolso';
