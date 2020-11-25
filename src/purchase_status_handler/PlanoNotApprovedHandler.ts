@@ -14,7 +14,7 @@ export default class PlanoNotApprovedHandler extends AbstractPurchaseStatusHandl
     async handle(purchaseStatus: PurchaseStatus) {
         if (purchaseStatus === PurchaseStatus.PLANO_NOT_APPROVED) {
             log(`Plano informado por ${this._ctx.chat.id} não é o mesmo da compra`)
-            await this._ctx.reply('O plano que você selecionou não é o mesmo que consta na compra na Monetizze. Por favor comece nossa conversa novamente com /reiniciar e atribua o plano correto.');
+            await this._ctx.reply('O plano que você selecionou não é o mesmo que consta na compra na Eduzz. Por favor comece nossa conversa novamente com /reiniciar e atribua o plano correto.');
             return await endConversation(this._ctx);
         } else {
             super.handle(purchaseStatus)

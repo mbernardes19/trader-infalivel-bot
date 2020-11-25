@@ -35,14 +35,14 @@ bot.command('canais', async ctx => {
     try {
         const dbUserResult = await getUserByTelegramId(ctx.chat.id, connection);
         if (!dbUserResult) {
-            return await ctx.reply('Você ainda não ativou sua assinatura Monetizze comigo.');
+            return await ctx.reply('Você ainda não ativou sua assinatura Eduzz comigo.');
         }
         if (dbUserResult.ver_canais >= 2) {
             return await ctx.reply('Você já visualizou os canais 2 vezes!');
         }
         const user = User.fromDatabaseResult(dbUserResult);
         if (user.getUserData().statusAssinatura !== 'ativa') {
-            return await ctx.reply('Você já ativou sua assinatura Monetizze comigo, porém seu status de assinatura na Monetizze não está como ativo, regularize sua situação com a Monetizze para ter acesso aos canais.');
+            return await ctx.reply('Você já ativou sua assinatura Eduzz comigo, porém seu status de assinatura na Eduzz não está como ativo, regularize sua situação com a Eduzz para ter acesso aos canais.');
         }
         const { plano } = user.getUserData()
         const chats = await getChats(plano);
@@ -52,7 +52,7 @@ bot.command('canais', async ctx => {
         await updateViewChats(ctx.chat.id, connection);
     } catch (err) {
         logError(`ERRO AO ENVIAR CANAIS DISPONÍVEIS POR COMANDO PARA USUÁRIO ${ctx.chat.id}`, err)
-        await ctx.reply('Ocorreu um erro ao verificar sua assinatura Monetizze. Tente novamente mais tarde.')
+        await ctx.reply('Ocorreu um erro ao verificar sua assinatura Eduzz. Tente novamente mais tarde.')
     }
 });
 
@@ -60,24 +60,59 @@ bot.command('canais', async ctx => {
     // const eduzz = new EduzzService();
     // const authCredentials: EduzzAuthCredentials = {email: 'grupocollab@gmail.com', publicKey: '33634949', apiKey: '4366B150AE'}
     // await eduzz.authenticate(authCredentials);
-    // const res = await eduzz.getPurchases({client_email: 'paulosilva42@outlook.com.br'})
-    // res.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
+    // const res = await eduzz.getPurchases()
+    // res.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })
     // const res2 = await eduzz.getPurchases({page: 2})
-    // res2.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
+    // res2.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })
     // const res3 = await eduzz.getPurchases({page: 3})
-    // res3.data.map(s => console.log(s.client_email, s.content_id, s.content_title, s.sale_status, s.sale_status_name))
+    // res3.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })
     // const res4 = await eduzz.getPurchases({page: 4})
-    // res4.data.map(s => console.log(s.content_id, s.content_title))
+    // res4.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })
     // const res5 = await eduzz.getPurchases({page: 5})
-    // res5.data.map(s => console.log(s.content_id, s.content_title))
-    // const res6 = await eduzz.getPurchases({page: 6})
-    // res6.data.map(s => console.log(s.content_id, s.content_title))
-    // const res7 = await eduzz.getPurchases({page: 7})
-    // res7.data.map(s => console.log(s.content_id, s.content_title))
-    // const res8 = await eduzz.getPurchases({page: 8})
-    // res8.data.map(s => console.log(s.content_id, s.content_title))
+    // res5.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })    // const res6 = await eduzz.getPurchases({page: 6})
+    // // res6.data.map(s => console.log(s.content_id, s.content_title))
+    // // const res7 = await eduzz.getPurchases({page: 7})
+    // // res7.data.map(s => console.log(s.content_id, s.content_title))
+    // // const res8 = await eduzz.getPurchases({page: 8})
+    // // res8.data.map(s => console.log(s.content_id, s.content_title))
     // const res9 = await eduzz.getPurchases({page: 9})
-    // res9.data.map(s => console.log(s.content_id, s.content_title))
+    // res9.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })
+    // const res10 = await eduzz.getPurchases({page: 10})
+    // res10.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })
+    // const res11 = await eduzz.getPurchases({page: 11})
+    // res11.data.map(s => {
+    //     if (s.content_title !== 'Metodo Marketing Infalivel') {
+    //         console.log(s.client_email, s.contract_id, s.content_title)
+    //     }
+    // })
 })()
 
 bot.command('t35t3', async ctx => {
@@ -96,7 +131,7 @@ bot.on('message', async ctx => {
         return;
     }
     try {
-        await ctx.reply('Olá, sou o Bot do Método Trader Infalível 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/parar - Parar nossa conversa\n/reiniciar - Começar nossa conversa do zero\n/suporte - Entrar em contato com nosso suporte')
+        await ctx.reply('Olá, sou o Bot do IQ O Segredo 🤖💵!\nSegue abaixo meus comandos:\n\n/start - Começar nossa conversa\n/parar - Parar nossa conversa\n/reiniciar - Começar nossa conversa do zero\n/suporte - Entrar em contato com nosso suporte')
     } catch (err) {
         log(`ERRO AO ENVIAR MENSAGEM DE BOAS VINDAS ${err}`)
     }

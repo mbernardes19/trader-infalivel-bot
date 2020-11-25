@@ -16,7 +16,7 @@ planoScene.enter(async ctx => {
 const askForPlano = async (ctx) => {
     try {
         await ctx.reply('Certo!');
-        await ctx.reply('Vou precisar de mais alguns dados pra confirmar o pagamento no servidor da Monetizze, tudo bem?');
+        await ctx.reply('Vou precisar de mais alguns dados pra confirmar o pagamento no servidor da Eduzz, tudo bem?');
     } catch (err) {
         log(`ERRO AO ENVIAR MENSAGEM ${err}`)
     }

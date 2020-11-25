@@ -110,7 +110,7 @@ export default class PurchaseApprovedHandler extends AbstractPurchaseStatusHandl
                     await this._ctx.reply(`Você já ativou sua assinatura Monettize comigo antes.`)
                     return await endConversation(this._ctx);
                 } else {
-                    await this._ctx.reply(`Sua compra na Monetizze foi confirmada, porém ocorreu um erro ao ativar sua assinatura na Monetizze.`)
+                    await this._ctx.reply(`Sua compra na Eduzz foi confirmada, porém ocorreu um erro ao ativar sua assinatura na Eduzz.`)
                     return await endConversation(this._ctx);
                 }
             }

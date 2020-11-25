@@ -17,7 +17,7 @@ emailScene.onEnter(async (ctx) => {
 
 const askForEmail = async (ctx) => {
     await ctx.reply('Ok!');
-    await ctx.reply('Agora eu só preciso que me mande o seu email. Tem que ser o mesmo email com o qual você fez a compra na Monetizze, para que eu possa te achar no sistema.\n\nTenha certeza de estar mandando o email certo!');
+    await ctx.reply('Agora eu só preciso que me mande o seu email. Tem que ser o mesmo email com o qual você fez a compra na Eduzz, para que eu possa te achar no sistema.\n\nTenha certeza de estar mandando o email certo!');
 }
 
 const askForEmailAgain = async (ctx) => {

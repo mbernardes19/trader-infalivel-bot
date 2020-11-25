@@ -14,7 +14,7 @@ export default class BoletoPaymentNotApprovedYetHandler extends AbstractPurchase
     async handle(purchaseStatus: PurchaseStatus) {
         if (purchaseStatus === PurchaseStatus.BOLETO_PAYMENT_NOT_APPROVED_YET) {
             log(`Pagamento de ${this._ctx.chat.id} foi em boleto e está aguardando pagamento`)
-            await this._ctx.reply('Sua compra foi iniciada, porém o seu boleto ainda não foi pago/compensado. Você pode ver o status do seu boleto acessando monetizze.com.br . Quando estiver compensado volte e inicie uma conversa comigo novamente!')
+            await this._ctx.reply('Sua compra foi iniciada, porém o seu boleto ainda não foi pago/compensado. Você pode ver o status do seu boleto acessando eduzz.com . Quando estiver compensado volte e inicie uma conversa comigo novamente!')
             return await endConversation(this._ctx);
         } else {
             super.handle(purchaseStatus)
