@@ -121,13 +121,13 @@ const sendMessageToUsersCloseToEndAssinatura = async (users: User[]) => {
     const actions = []
     usersCloseToEndAssinatura.forEach(user => {
         if (user.getUserData().diasAteFimDaAssinatura === 3) {
-            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(3), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
+            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(3), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 2', url: 't.me/julianocba'}]]}}))
         }
         if (user.getUserData().diasAteFimDaAssinatura === 2) {
-            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(2), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
+            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(2), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 2', url: 't.me/julianocba'}]]}}))
         }
         if (user.getUserData().diasAteFimDaAssinatura === 1) {
-            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(1), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url:'t.me/juliasantanana'}], [{text: '👉 SUPORTE 2', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 3', url: 't.me/julianocba'}]]}}))
+            actions.push(telegramClient.sendMessage(user.getUserData().telegramId, mensagemAviso(1), {reply_markup: {inline_keyboard: [[{text: '👉 SUPORTE 1', url: 't.me/diego_sti'}], [{text: '👉 SUPORTE 2', url: 't.me/julianocba'}]]}}))
         }
     })
 };

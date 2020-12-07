@@ -3,9 +3,8 @@ import { Planos, PlanosEduzz } from './Planos';
 
 export default class Keyboard {
     static SUPPORT = Markup.inlineKeyboard([
-        [Markup.urlButton('👉 SUPORTE 1', 't.me/juliasantanana')],
-        [Markup.urlButton('👉 SUPORTE 2', 't.me/diego_sti')],
-        [Markup.urlButton('👉 SUPORTE 3', 't.me/julianocba')],
+        [Markup.urlButton('👉 SUPORTE 1', 't.me/diego_sti')],
+        [Markup.urlButton('👉 SUPORTE 2', 't.me/julianocba')],
     ]);
 
     static CONFIRMATION = Markup.inlineKeyboard([
