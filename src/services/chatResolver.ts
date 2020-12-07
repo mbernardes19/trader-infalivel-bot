@@ -31,7 +31,6 @@ export function getChats(plano: string): number[] {
                 chats.push(parseInt(process.env.ID_CANAL_VIP));
                 break;
             case PlanosEduzz.PREMIUM:
-                chats.push(parseInt(process.env.ID_CANAL_VIP));
                 chats.push(parseInt(process.env.ID_GRUPO_PREMIUM));
                 break;
             case PlanosEduzz.basic:
