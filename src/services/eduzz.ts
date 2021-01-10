@@ -116,6 +116,8 @@ export default class EduzzService extends CoursePlatformService<EduzzSaleOptions
                     if (user.data[0].sale_status_name === 'Reembolsado') {
                         return 'reembolsado';
                     }
+                } else {
+                    return 'ativa';
                 }
             })
         } catch (err) {
