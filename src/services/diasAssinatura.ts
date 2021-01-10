@@ -7,6 +7,9 @@ const pegarDiasSobrandoDeAssinatura = async (plano: string, email: string) => {
     let response
     try {
         response = await getMonetizzeProductTransaction({email})
+        if (response.dados.length === 0) {
+            return 0;
+        }
     } catch (err) {
         logError(`ERRO AO PEGAR DIAS SOBRANDO DE ASSINATURA DO USUÁRIO ${email}`,err)
         throw err;
