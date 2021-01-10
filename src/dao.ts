@@ -32,7 +32,7 @@ const getUserByTelegramId = async (telegramId: string|number, connection: Connec
 const getAllValidUsers = async (connection: Connection): Promise<User[]> => {
     const query = util.promisify(connection.query).bind(connection)
     try {
-        const dbResults = await query(`select * from Users where status_assinatura = 'ativa' and kickado = 'N'`);
+        const dbResults = await query(`select * from Users where kickado = 'N'`);
         const users: User[] = dbResults.map(dbResult => User.fromDatabaseResult(dbResult))
         return users;
     } catch (err) {
